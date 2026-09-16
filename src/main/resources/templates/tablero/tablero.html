@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!--
+  Tablero de tareas (§4.3). Cada usuario ve el suyo.
+  Origen del módulo: un proyecto de referencia (columnas, prioridades, etiqueta de área).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Mi tablero', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Tareas</span>
+        <h2 class="m-0 mt-2 text-[32px] tracking-[-0.02em]" th:text="${tablero.nombre}">Mi tablero</h2>
+        <p class="mt-3 max-w-[65ch] text-[14px] leading-[1.6] text-neutral-700">
+            Arrastra las tarjetas entre columnas; la posición se guarda. Este tablero es
+            solo tuyo: nadie más lo ve ni puede moverlo.
+        </p>
+    </section>
+
+    <!-- Aviso de conflicto: lo pinta el JS cuando la API responde 409 (§5.2) -->
+    <div id="aviso-conflicto" class="aviso hidden" role="alert">
+        Alguien cambió esta tarea mientras la tenías abierta —quizá tú mismo, desde otra
+        pestaña—. Se recargó con la versión actual.
+    </div>
+
+    <!-- Alta rápida -->
+    <section class="card-strong p-5">
+        <h3 class="m-0 mb-4 text-[17px]">Nueva tarea</h3>
+        <form id="form-nueva-tarjeta" class="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-3">
+            <div class="flex min-w-0 flex-1 flex-col gap-1">
+                <label for="nueva-titulo" class="etiqueta-campo">Título</label>
+                <input id="nueva-titulo" name="titulo" type="text" required maxlength="200"
+                       class="input-linea" placeholder="¿Qué hay que hacer?">
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="nueva-etiqueta" class="etiqueta-campo">Área</label>
+                <input id="nueva-etiqueta" name="etiqueta" type="text" maxlength="120"
+                       class="input-linea sm:w-[150px]" placeholder="Opcional">
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="nueva-prioridad" class="etiqueta-campo">Prioridad</label>
+                <select id="nueva-prioridad" name="prioridad" class="input-linea sm:w-[120px]">
+                    <option value="NORMAL">Normal</option>
+                    <option value="ALTA">Alta</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="nueva-fecha-limite" class="etiqueta-campo">Vence</label>
+                <input id="nueva-fecha-limite" name="fechaLimite" type="datetime-local"
+                       class="input-linea sm:w-[190px]">
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="nueva-columna" class="etiqueta-campo">Columna</label>
+                <select id="nueva-columna" name="columnaId" class="input-linea sm:w-[170px]">
+                    <option th:each="c : ${columnas}" th:value="${c.id}" th:text="${c.nombre}">Columna</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary px-[18px] py-3 text-[13px] uppercase tracking-[0.06em]">
+                Añadir
+            </button>
+        </form>
+    </section>
+
+    <!-- ══ COLUMNAS ══════════════════════════════════════════════════════ -->
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" id="tablero">
+        <div th:each="c : ${columnas}" class="tablero-columna flex min-h-[200px] flex-col overflow-hidden">
+
+            <header class="flex items-baseline justify-between gap-2 border-b border-divider bg-surface px-4 py-3">
+                <h3 class="m-0 text-[14px] uppercase tracking-[0.08em]" th:text="${c.nombre}">Columna</h3>
+                <span class="tag tag-neutral"
+                      th:text="${tarjetasPorColumna.containsKey(c.id) ? #lists.size(tarjetasPorColumna.get(c.id)) : 0}">0</span>
+            </header>
+
+            <!-- Zona de soltado -->
+            <div class="flex flex-1 flex-col gap-3 p-3" data-columna th:data-columna-id="${c.id}">
+
+                <article th:each="t : ${tarjetasPorColumna.containsKey(c.id) ? tarjetasPorColumna.get(c.id) : {}}"
+                         draggable="true" data-tarjeta
+                         th:data-tarjeta-id="${t.id}"
+                         th:data-version="${t.version}"
+                         class="tablero-tarjeta p-3">
+
+                    <div class="flex items-start justify-between gap-2">
+                        <p class="m-0 text-[14px] font-semibold leading-snug" th:text="${t.titulo}">Título</p>
+                        <button type="button" data-borrar aria-label="Eliminar tarea" class="tablero-borrar">×</button>
+                    </div>
+
+                    <p th:if="${t.nota != null}" class="m-0 mt-1.5 text-[13px] leading-[1.5] text-neutral-700"
+                       th:text="${t.nota}">Nota</p>
+
+                    <div class="mt-2.5 flex flex-wrap items-center gap-2">
+                        <span th:if="${t.prioridad.name() == 'ALTA'}"
+                              class="tag tag-warning uppercase tracking-[0.06em]">Alta</span>
+                        <span th:if="${t.etiqueta != null}" class="tag tag-neutral" th:text="${t.etiqueta}">Área</span>
+                        <span th:if="${t.fechaLimite != null}" class="tag uppercase tracking-[0.06em]"
+                              th:classappend="${c.codigo != 'HECHO' and t.fechaLimite.isBefore(ahora)} ? 'tag-danger' : 'tag-outline'"
+                              th:text="'Vence ' + ${#temporals.format(t.fechaLimite, 'dd/MM HH:mm')}">Vence</span>
+                    </div>
+
+                    <p class="m-0 mt-2 text-[11px] text-neutral-500"
+                       th:text="'Creada el ' + ${#temporals.format(t.creadoEn, 'dd/MM/yyyy HH:mm')}">Creada</p>
+                </article>
+
+                <p th:if="${!tarjetasPorColumna.containsKey(c.id) or #lists.isEmpty(tarjetasPorColumna.get(c.id))}"
+                   class="m-0 py-4 text-center text-[13px] text-neutral-500" data-vacio>
+                    Suelta una tarea aquí
+                </p>
+            </div>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

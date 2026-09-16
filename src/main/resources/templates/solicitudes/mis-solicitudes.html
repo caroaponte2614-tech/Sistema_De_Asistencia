@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!-- "Mis solicitudes" del §7: permisos y vacaciones del propio colaborador. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Mis solicitudes', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Solicitudes</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Mis permisos y vacaciones</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+    </section>
+
+    <!-- Saldo de vacaciones: causados vs. tomados vs. en trámite (§4.5) -->
+    <section class="grid grid-cols-2 gap-5 sm:grid-cols-4">
+        <div class="stat stat-highlight">
+            <span class="card-kicker">Disponibles</span>
+            <p class="stat-value" th:text="${#numbers.formatDecimal(saldoDisponible, 1, 2)}">0</p>
+            <p class="m-0 mt-1 text-[12px] text-neutral-600">días hábiles</p>
+        </div>
+        <div class="stat">
+            <span class="card-kicker">Causados</span>
+            <p class="stat-value" th:text="${#numbers.formatDecimal(saldoCausados, 1, 2)}">0</p>
+        </div>
+        <div class="stat">
+            <span class="card-kicker">Tomados</span>
+            <p class="stat-value" th:text="${#numbers.formatDecimal(saldoTomados, 1, 2)}">0</p>
+        </div>
+        <div class="stat">
+            <span class="card-kicker">En trámite</span>
+            <p class="stat-value" th:text="${#numbers.formatDecimal(saldoEnTramite, 1, 2)}">0</p>
+        </div>
+    </section>
+
+    <p class="m-0 text-[13px] text-neutral-600">
+        Se causan <span th:text="${diasPorMes}">1.25</span> días hábiles por cada mes
+        trabajado. "En trámite" son días ya apartados por una solicitud que todavía no se
+        resuelve: no se pueden volver a pedir.
+    </p>
+
+    <section>
+        <div class="mb-4 flex flex-wrap items-baseline justify-between gap-4">
+            <h2 class="m-0 text-[25px]">Historial</h2>
+            <a th:href="@{/mi-espacio/solicitudes/nueva}"
+               class="btn btn-primary px-[18px] py-3 text-[13px] uppercase tracking-[0.06em]">
+                Nueva solicitud
+            </a>
+        </div>
+
+        <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(solicitudes)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="pl-5">Tipo</th>
+                    <th>Desde</th>
+                    <th>Hasta</th>
+                    <th>Días</th>
+                    <th>Estado</th>
+                    <th>Motivo</th>
+                    <th class="pr-5">Adjunto</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${solicitudes}">
+                    <td class="pl-5" th:text="${s.tipo.nombre}">Tipo</td>
+                    <td th:text="${#temporals.format(s.fechaInicio, 'dd/MM/yyyy')}">01/01/2026</td>
+                    <td th:text="${#temporals.format(s.fechaFin, 'dd/MM/yyyy')}">05/01/2026</td>
+                    <td th:text="${#numbers.formatDecimal(s.diasHabiles, 1, 2)}">5</td>
+                    <td>
+                        <span class="tag uppercase tracking-[0.06em]"
+                              th:classappend="${s.estado.name() == 'APROBADO'} ? 'tag-success'
+                                            : (${s.estado.name().startsWith('RECHAZADO')} ? 'tag-danger' : 'tag-outline')"
+                              th:text="${etiquetasEstado.get(s.estado)}">Estado</span>
+                    </td>
+                    <td class="text-neutral-700" th:text="${s.motivo}">—</td>
+                    <td class="pr-5">
+                        <a th:if="${s.archivoClave != null}" target="_blank"
+                           th:href="@{'/mi-espacio/solicitudes/' + ${s.id} + '/soporte'}"
+                           class="text-[13px]">Ver</a>
+                        <span th:if="${s.archivoClave == null}" class="text-neutral-500">—</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p th:if="${#lists.isEmpty(solicitudes)}" class="text-[14px] text-neutral-700">
+            Todavía no has pedido nada. La primera vez, empieza por
+            <a th:href="@{/mi-espacio/solicitudes/nueva}">crear una solicitud</a>.
+        </p>
+    </section>
+
+</th:block>
+</body>
+</html>

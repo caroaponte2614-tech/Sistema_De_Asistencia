@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!-- Administración de documentos institucionales: alta, publicar/archivar, orden y el reporte de lecturas. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Documentos institucionales', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Talento Humano</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Documentos institucionales</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+    </section>
+
+    <section>
+        <div class="mb-4 flex flex-wrap items-baseline justify-between gap-4">
+            <h2 class="m-0 text-[25px]">Catálogo</h2>
+            <div class="flex flex-wrap gap-3">
+                <a th:href="@{/talento-humano/documentos-institucionales/reporte.xlsx}"
+                   class="btn btn-secondary px-[18px] py-3 text-[13px] uppercase tracking-[0.06em]">
+                    Descargar reporte
+                </a>
+                <a th:href="@{/talento-humano/documentos-institucionales/nuevo}"
+                   class="btn btn-primary px-[18px] py-3 text-[13px] uppercase tracking-[0.06em]">
+                    Nuevo documento
+                </a>
+            </div>
+        </div>
+
+        <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(documentos)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="pl-5">Orden</th>
+                    <th>Título</th>
+                    <th>Categoría</th>
+                    <th>Obligatorio</th>
+                    <th>Estado</th>
+                    <th class="pr-5">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="doc : ${documentos}">
+                    <td class="pl-5">
+                        <div class="flex gap-1">
+                            <form th:action="@{'/talento-humano/documentos-institucionales/' + ${doc.id} + '/mover'}" method="post" class="m-0">
+                                <input type="hidden" name="direccion" value="arriba">
+                                <button type="submit" class="btn btn-secondary h-7 w-7 p-0 text-[12px]" aria-label="Subir">↑</button>
+                            </form>
+                            <form th:action="@{'/talento-humano/documentos-institucionales/' + ${doc.id} + '/mover'}" method="post" class="m-0">
+                                <input type="hidden" name="direccion" value="abajo">
+                                <button type="submit" class="btn btn-secondary h-7 w-7 p-0 text-[12px]" aria-label="Bajar">↓</button>
+                            </form>
+                        </div>
+                    </td>
+                    <td th:text="${doc.titulo}">Título</td>
+                    <td th:text="${doc.categoria}">—</td>
+                    <td th:text="${doc.obligatorio} ? 'Sí' : 'No'">No</td>
+                    <td>
+                        <span class="tag uppercase tracking-[0.06em]"
+                              th:classappend="${doc.publicado} ? 'tag-neutral' : 'tag-outline'"
+                              th:text="${doc.publicado} ? 'Publicado' : 'Borrador'">Estado</span>
+                    </td>
+                    <td class="pr-5">
+                        <div class="flex flex-wrap gap-2">
+                            <a th:href="@{'/talento-humano/documentos-institucionales/' + ${doc.id} + '/editar'}"
+                               class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                                Editar
+                            </a>
+                            <form th:action="@{'/talento-humano/documentos-institucionales/' + ${doc.id} + '/publicar'}" method="post" class="m-0">
+                                <input type="hidden" name="publicado" th:value="${not doc.publicado}">
+                                <button type="submit" class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                                    <span th:text="${doc.publicado} ? 'Despublicar' : 'Publicar'">Publicar</span>
+                                </button>
+                            </form>
+                            <form th:action="@{'/talento-humano/documentos-institucionales/' + ${doc.id} + '/archivar'}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                                    Archivar
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p th:if="${#lists.isEmpty(documentos)}" class="text-[14px] text-neutral-700">
+            Todavía no has creado ningún documento institucional.
+        </p>
+    </section>
+
+</th:block>
+</body>
+</html>

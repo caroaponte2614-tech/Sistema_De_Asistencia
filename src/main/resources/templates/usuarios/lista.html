@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!-- Listado del módulo de usuarios (ADMIN/SUPERVISOR, D-021). Incluye activos e
+     inactivos: reactivar a alguien también pasa por acá. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Usuarios', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Talento Humano</span>
+            <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Usuarios</h1>
+            <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        </div>
+        <a th:href="@{/talento-humano/usuarios/nuevo}"
+           class="btn btn-primary px-5 py-3 text-[13px] uppercase tracking-[0.06em]">
+            Nuevo usuario
+        </a>
+    </section>
+
+    <section class="card overflow-x-auto p-0">
+        <table class="table">
+            <thead>
+            <tr>
+                <th class="pl-5">Nombre</th>
+                <th>Correo</th>
+                <th>Cargo</th>
+                <th>Jefe directo</th>
+                <th>Estado</th>
+                <th class="pr-5"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${usuarios}">
+                <td class="pl-5 font-heading" th:text="${u.nombre}">Nombre</td>
+                <td class="break-all text-[13px] text-neutral-700" th:text="${u.email}">correo</td>
+                <td th:text="${u.cargo != null ? u.cargo.nombre : '—'}">Cargo</td>
+                <td th:text="${u.coordinador != null ? u.coordinador.nombre : '—'}">Jefe</td>
+                <td>
+                    <span class="tag" th:classappend="${u.estado.name() == 'ACTIVO'} ? 'tag-success' : 'tag-outline'"
+                          th:text="${u.estado.name() == 'ACTIVO'} ? 'Activo' : 'Inactivo'">Estado</span>
+                </td>
+                <td class="pr-5">
+                    <a th:href="@{/talento-humano/usuarios/{id}(id=${u.id})}"
+                       class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                        Ver / editar
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+</th:block>
+</body>
+</html>

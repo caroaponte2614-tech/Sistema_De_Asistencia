@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!-- "Mis documentos": el portafolio público del colaborador (hoja de vida, certificados,
+     soportes). Cada quien sube y borra lo suyo — la carpeta restringida de expediente
+     (contrato, afiliaciones...) la administra RH desde otro lado, no aquí. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Mis documentos', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Documentos</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Mi portafolio</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 max-w-[62ch] text-[15px] leading-[1.6] text-neutral-700">
+            Hoja de vida, certificados y soportes: los subís y los borrás vos. Los
+            documentos de tu expediente (contrato, afiliaciones, exámenes) los administra
+            Talento Humano aparte.
+        </p>
+    </section>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[320px_1fr]">
+
+        <!-- ══ SUBIR ═══════════════════════════════════════════════════════ -->
+        <section class="card-strong p-6">
+            <span class="card-kicker">Subir documento</span>
+
+            <form th:action="@{/mi-espacio/documentos}" method="post" enctype="multipart/form-data"
+                  class="mt-4 flex flex-col gap-4">
+                <div>
+                    <label class="etiqueta-campo" for="categoriaCodigo">Categoría</label>
+                    <select id="categoriaCodigo" name="categoriaCodigo" required class="input">
+                        <option th:each="c : ${categorias}" th:value="${c.codigo}" th:text="${c.nombre}">
+                            Hoja de vida
+                        </option>
+                    </select>
+                </div>
+                <div>
+                    <label class="etiqueta-campo" for="titulo">Título</label>
+                    <input id="titulo" name="titulo" type="text" required maxlength="200" class="input"
+                           placeholder="Ej: Hoja de vida 2026">
+                </div>
+                <div>
+                    <label class="etiqueta-campo" for="descripcion">Descripción (opcional)</label>
+                    <textarea id="descripcion" name="descripcion" maxlength="500" rows="2" class="input"></textarea>
+                </div>
+                <div>
+                    <label class="etiqueta-campo" for="archivo">Archivo</label>
+                    <input id="archivo" name="archivo" type="file" required class="input">
+                    <p class="m-0 mt-1 text-[11px] text-neutral-600">Máximo 10 MB.</p>
+                </div>
+                <button type="submit" class="btn btn-primary w-full py-3 text-[13px] uppercase tracking-[0.06em]">
+                    Subir
+                </button>
+            </form>
+        </section>
+
+        <!-- ══ LISTADO ═════════════════════════════════════════════════════ -->
+        <section>
+            <h2 class="m-0 mb-4 text-[22px]">Tus documentos</h2>
+
+            <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(documentos)}">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="pl-5">Categoría</th>
+                        <th>Título</th>
+                        <th>Versión</th>
+                        <th>Subido</th>
+                        <th class="pr-5">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d : ${documentos}">
+                        <td class="pl-5">
+                            <span class="tag tag-outline uppercase tracking-[0.06em]" th:text="${d.categoria.nombre}">Categoría</span>
+                        </td>
+                        <td>
+                            <p class="m-0 font-heading text-[14px]" th:text="${d.titulo}">Título</p>
+                            <p th:if="${d.descripcion}" class="m-0 text-[12px] text-neutral-600" th:text="${d.descripcion}">Descripción</p>
+                        </td>
+                        <td th:text="|v${d.versionActual}|">v1</td>
+                        <td th:text="${#temporals.format(d.creadoEn, 'dd/MM/yyyy')}">01/01/2026</td>
+                        <td class="pr-5">
+                            <div class="flex flex-wrap gap-2">
+                                <a th:href="@{/mi-espacio/documentos/{id}/descargar(id=${d.id})}"
+                                   class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                                    Descargar
+                                </a>
+                                <form th:action="@{/mi-espacio/documentos/{id}/eliminar(id=${d.id})}" method="post" class="m-0">
+                                    <button type="submit"
+                                            class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p th:if="${#lists.isEmpty(documentos)}" class="text-[14px] text-neutral-700">
+                Todavía no subiste ningún documento. Empezá por tu hoja de vida.
+            </p>
+        </section>
+    </div>
+
+</th:block>
+</body>
+</html>

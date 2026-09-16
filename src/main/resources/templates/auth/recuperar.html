@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!--
+  Solicitud de recuperación de contraseña.
+  Flujo portado de un proyecto de referencia (services/password/PasswordResetService.java)
+  (token UUID, 30 minutos de vida, uno solo vivo por usuario).
+  Cambio respecto al original: la respuesta es SIEMPRE la misma exista o no el
+  correo — el original devolvía false y el controlador lo revelaba (§2.2.6).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/auth-layout :: pagina('Recuperar contraseña', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <span class="mb-3.5 text-[12px] uppercase tracking-[0.14em] text-[var(--color-accent-700)]">Recuperar acceso</span>
+    <h2 class="m-0 mb-2 text-[34px] tracking-[-0.02em]">¿Olvidaste tu contraseña?</h2>
+    <p class="m-0 mb-8 text-[15px] text-[var(--color-neutral-700)]">
+        Escribe tu correo corporativo y te enviamos un enlace para crear una nueva.
+        El enlace vence en <span th:text="${minutosVigencia}">30</span> minutos.
+    </p>
+
+    <div th:if="${param.bloqueado}" class="aviso mb-6" role="alert">
+        Ya pediste varios enlaces en poco tiempo. Espera unos minutos antes de volver a intentarlo.
+    </div>
+
+    <form th:action="@{/recuperar}" method="post" class="flex flex-col gap-[22px]" data-formulario-auth>
+        <div class="flex flex-col gap-2">
+            <label for="email" class="etiqueta-campo">Correo corporativo</label>
+            <input id="email" name="email" type="email" required autofocus
+                   placeholder="nombre.apellido@schoolplus.example" autocomplete="username"
+                   class="input-linea">
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary flex w-full items-center gap-2.5 !justify-start px-[18px] py-4 text-[14px] uppercase tracking-[0.06em]"
+                data-etiqueta-envio="Enviando…">
+            <span class="flex-1 text-left">Enviar enlace</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="square" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6"></path>
+            </svg>
+        </button>
+    </form>
+
+    <p class="mt-8 text-[13px] text-[var(--color-neutral-700)]">
+        <a th:href="@{/}">Volver al inicio de sesión</a>
+    </p>
+
+</th:block>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!-- Todos los documentos institucionales: cuadrícula con buscador y filtros, mismo
+     patrón que capacitaciones/catalogo.html. Abrir uno lo marca como leído. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Documentos institucionales', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Documentos</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Documentos institucionales</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 max-w-[62ch] text-[15px] leading-[1.6] text-neutral-700">
+            Políticas, manuales y formatos de toda la empresa. Abrir uno lo marca como leído.
+        </p>
+    </section>
+
+    <section th:if="${not #lists.isEmpty(documentos)}" data-catalogo>
+        <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <h2 class="m-0 text-[25px]">Catálogo</h2>
+            <input type="search" data-catalogo-buscador placeholder="Buscar documentos..."
+                   aria-label="Buscar documentos" class="input-linea w-full sm:w-[320px]">
+        </div>
+
+        <div class="mb-6 flex flex-wrap gap-2">
+            <button type="button" data-catalogo-filtro
+                    class="btn btn-primary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">Todos</button>
+            <button type="button" data-catalogo-filtro data-campo="obligatorio" data-valor="true"
+                    class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">Obligatorios</button>
+            <button type="button" data-catalogo-filtro data-campo="leido" data-valor="true"
+                    class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">Leídos</button>
+            <button type="button" data-catalogo-filtro data-campo="leido" data-valor="false"
+                    class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">Pendientes</button>
+        </div>
+
+        <div data-catalogo-lista class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <article th:each="doc : ${documentos}" data-catalogo-tarjeta
+                     th:with="leido=${vistos.contains(doc.id)}"
+                     th:attr="data-titulo=${#strings.toLowerCase(doc.titulo + ' ' + (doc.categoria != null ? doc.categoria : '') + ' ' + (doc.descripcion != null ? doc.descripcion : ''))},
+                              data-obligatorio=${doc.obligatorio},
+                              data-leido=${leido}"
+                     class="card flex flex-col overflow-hidden p-0">
+                <a th:href="@{'/mi-espacio/documentos-institucionales/' + ${doc.id} + '/ver'}" target="_blank"
+                   class="block no-underline hover:no-underline">
+                    <div class="aspect-video w-full overflow-hidden bg-accent-100">
+                        <img th:if="${doc.miniaturaClave != null}"
+                             th:src="@{'/mi-espacio/documentos-institucionales/' + ${doc.id} + '/miniatura'}"
+                             alt="" class="h-full w-full object-cover">
+                        <div th:if="${doc.miniaturaClave == null}"
+                             class="grid h-full w-full place-items-center text-[13px] uppercase tracking-[0.08em] text-accent-700">
+                            Documento
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2 p-4">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span th:if="${doc.categoria != null}" class="card-kicker" th:text="${doc.categoria}">Categoría</span>
+                            <span th:if="${doc.obligatorio}" class="tag tag-accent uppercase tracking-[0.06em]">Obligatorio</span>
+                            <span th:if="${leido}" class="tag tag-neutral uppercase tracking-[0.06em]">✓ Leído</span>
+                        </div>
+                        <h3 class="m-0 text-[16px] text-ink" th:text="${doc.titulo}">Título</h3>
+                        <p class="m-0 line-clamp-2 text-[13px] text-neutral-600" th:text="${doc.descripcion}">—</p>
+                    </div>
+                </a>
+            </article>
+        </div>
+
+        <p data-catalogo-sin-resultados class="hidden text-[14px] text-neutral-700">
+            Ningún documento coincide con tu búsqueda o filtro.
+        </p>
+    </section>
+
+    <section th:if="${#lists.isEmpty(documentos)}">
+        <p class="text-[14px] text-neutral-700">
+            Todavía no hay documentos institucionales publicados.
+        </p>
+    </section>
+
+</th:block>
+</body>
+</html>

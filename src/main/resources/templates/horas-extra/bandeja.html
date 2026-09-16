@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!-- Bandeja de Talento Humano: única instancia, aprueba o deniega (§4.6). -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Horas extra', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Talento Humano</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Horas extra por resolver</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 max-w-[70ch] text-[15px] leading-[1.6] text-neutral-700">
+            Lo que los coordinadores registraron para su equipo. No hay segunda instancia:
+            lo que decides aquí queda firme. Para ver también lo ya aprobado o denegado,
+            entra al <a th:href="@{/talento-humano/horas-extras/historial}">historial completo</a>.
+        </p>
+    </section>
+
+    <section th:if="${#lists.isEmpty(registros)}">
+        <div class="border-l-[3px] border-neutral-400 bg-neutral-100 px-5 py-4 text-[14px] text-neutral-700">
+            No hay horas extra pendientes por resolver.
+        </div>
+    </section>
+
+    <section class="flex flex-col gap-5">
+        <article th:each="r : ${registros}" class="card border-l-[3px] border-accent p-6">
+
+            <div class="flex flex-wrap items-baseline justify-between gap-3">
+                <div>
+                    <span class="card-kicker" th:text="${r.recargo.nombre}">Tipo</span>
+                    <h2 class="m-0 mt-1 text-[22px]" th:text="${r.colaborador.nombre}">Nombre</h2>
+                </div>
+                <span class="tag tag-outline uppercase tracking-[0.06em]"
+                      th:text="${#numbers.formatDecimal(r.horas, 1, 2)} + ' horas'">2 horas</span>
+            </div>
+
+            <dl class="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-[14px] sm:grid-cols-4">
+                <div>
+                    <dt class="text-[11px] uppercase tracking-[0.1em] text-neutral-600">Fecha</dt>
+                    <dd class="m-0" th:text="${#temporals.format(r.fecha, 'dd/MM/yyyy')}">—</dd>
+                </div>
+                <div>
+                    <dt class="text-[11px] uppercase tracking-[0.1em] text-neutral-600">Registradas por</dt>
+                    <dd class="m-0" th:text="${r.registradoPor.nombre}">—</dd>
+                </div>
+                <div class="col-span-2">
+                    <dt class="text-[11px] uppercase tracking-[0.1em] text-neutral-600">Observación</dt>
+                    <dd class="m-0 text-neutral-700" th:text="${r.observacion ?: '—'}">—</dd>
+                </div>
+            </dl>
+
+            <div class="mt-6 flex flex-wrap items-end gap-3">
+                <form th:action="@{'/talento-humano/horas-extras/' + ${r.id} + '/aprobar'}" method="post" class="m-0">
+                    <button type="submit"
+                            class="btn btn-primary px-[18px] py-3 text-[13px] uppercase tracking-[0.06em]">
+                        Aprobar
+                    </button>
+                </form>
+
+                <form th:action="@{'/talento-humano/horas-extras/' + ${r.id} + '/rechazar'}" method="post"
+                      class="m-0 flex flex-wrap items-end gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label th:for="'motivo-' + ${r.id}" class="etiqueta-campo">Motivo de la negativa</label>
+                        <input th:id="'motivo-' + ${r.id}" name="motivo" type="text" required
+                               maxlength="300" class="input-linea w-[280px]" placeholder="Obligatorio">
+                    </div>
+                    <button type="submit"
+                            class="btn btn-secondary px-[18px] py-3 text-[13px] uppercase tracking-[0.06em]">
+                        Denegar
+                    </button>
+                </form>
+            </div>
+        </article>
+    </section>
+
+</th:block>
+</body>
+</html>

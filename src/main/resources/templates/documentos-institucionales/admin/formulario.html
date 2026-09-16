@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!-- Alta y edición de un documento institucional (políticas, manuales, formatos —
+     p.ej. bienestar/burnout, reglamento de trabajo). En modo alta (documento == null)
+     el archivo es obligatorio; en edición, dejarlo vacío conserva el actual. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina(${documento != null} ? ${documento.titulo} : 'Nuevo documento', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Talento Humano</span>
+        <h1 class="m-0 mt-3 text-[32px] leading-[1.1] tracking-[-0.02em]"
+            th:text="${documento != null} ? 'Editar documento' : 'Nuevo documento institucional'">Documento</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+    </section>
+
+    <section class="card-strong max-w-[620px] p-6">
+        <form th:action="${documento != null} ? @{'/talento-humano/documentos-institucionales/' + ${documento.id}} : @{/talento-humano/documentos-institucionales}"
+              method="post" enctype="multipart/form-data" class="flex flex-col gap-6">
+
+            <div class="flex flex-col gap-2">
+                <label for="titulo" class="etiqueta-campo">Título</label>
+                <input id="titulo" name="titulo" type="text" required maxlength="200" class="input-linea"
+                       th:value="${documento != null} ? ${documento.titulo} : ''">
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="descripcion" class="etiqueta-campo">Descripción</label>
+                <input id="descripcion" name="descripcion" type="text" maxlength="500" class="input-linea"
+                       th:value="${documento != null} ? ${documento.descripcion} : ''">
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="categoria" class="etiqueta-campo">Categoría</label>
+                <input id="categoria" name="categoria" type="text" maxlength="100" class="input-linea"
+                       list="categorias-sugeridas"
+                       placeholder="Ej. Bienestar y burnout, Reglamento de trabajo, Políticas"
+                       th:value="${documento != null} ? ${documento.categoria} : ''">
+                <datalist id="categorias-sugeridas">
+                    <option value="Bienestar y burnout"></option>
+                    <option value="Reglamento de trabajo"></option>
+                    <option value="Políticas"></option>
+                    <option value="Formatos"></option>
+                </datalist>
+            </div>
+
+            <label class="flex items-center gap-2 text-[14px] text-neutral-700">
+                <input type="checkbox" name="obligatorio" value="true"
+                       th:checked="${documento != null and documento.obligatorio}">
+                Lectura obligatoria
+            </label>
+
+            <div class="flex flex-col gap-2">
+                <label for="archivo" class="etiqueta-campo">Archivo</label>
+                <input id="archivo" name="archivo" type="file" th:required="${documento == null}" class="input-linea">
+                <p th:if="${documento != null}" class="m-0 text-[12px] text-neutral-600">
+                    Déjalo vacío para conservar el archivo actual.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="miniatura" class="etiqueta-campo">Imagen de la tarjeta</label>
+                <img th:if="${documento != null and documento.miniaturaClave != null}"
+                     th:src="@{'/mi-espacio/documentos-institucionales/' + ${documento.id} + '/miniatura'}"
+                     alt="" class="h-32 w-56 rounded-md border border-divider object-cover">
+                <input id="miniatura" name="miniatura" type="file" accept="image/*" class="input-linea">
+                <p class="m-0 text-[12px] text-neutral-600">
+                    Se muestra en el listado y en el carrusel del portal.
+                    <span th:if="${documento != null}">Déjalo vacío para conservar la imagen actual.</span>
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-3">
+                <button type="submit" class="btn btn-primary px-[18px] py-4 text-[14px] uppercase tracking-[0.06em]">
+                    Guardar
+                </button>
+                <a th:href="@{/talento-humano/documentos-institucionales}"
+                   class="btn btn-secondary px-[18px] py-4 text-[14px] uppercase tracking-[0.06em]">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
+
+</th:block>
+</body>
+</html>

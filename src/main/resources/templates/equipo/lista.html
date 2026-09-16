@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!-- Mi equipo: quién me reporta directamente, con enlaces a lo que puedo hacer sobre cada persona. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Mi equipo', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Coordinación</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Mi equipo</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+    </section>
+
+    <section class="flex flex-col gap-4">
+        <article th:each="persona : ${equipo}" class="card flex flex-wrap items-center justify-between gap-4 p-5">
+            <div>
+                <h2 class="m-0 text-[18px]" th:text="${persona.nombre}">Nombre</h2>
+                <p th:if="${persona.cargo != null}" class="m-0 mt-1 text-[13px] text-neutral-600" th:text="${persona.cargo.nombre}">Cargo</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a th:if="${@capacidades.puede('HORAS_EXTRA_REGISTRAR')}"
+                   th:href="@{/coordinacion/horas-extras/nueva}"
+                   class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                    Horas extra
+                </a>
+                <a th:if="${@capacidades.puede('RECONOCIMIENTO_VER')}"
+                   th:href="@{'/personas/' + ${persona.id} + '/reconocimientos'}"
+                   class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                    Reconocimientos
+                </a>
+                <a th:if="${@capacidades.puede('PERFIL_COLABORADOR_ADMINISTRAR')}"
+                   th:href="@{'/personas/' + ${persona.id} + '/perfil'}"
+                   class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                    Ficha
+                </a>
+                <a th:if="${@capacidades.puede('CERTIFICADO_LABORAL_GENERAR_TERCEROS')}"
+                   th:href="@{'/personas/' + ${persona.id} + '/certificado-laboral'}"
+                   class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                    Certificado laboral
+                </a>
+            </div>
+        </article>
+
+        <p th:if="${#lists.isEmpty(equipo)}" class="text-[14px] text-neutral-700">
+            Todavía no tienes a nadie a cargo.
+        </p>
+    </section>
+
+</th:block>
+</body>
+</html>

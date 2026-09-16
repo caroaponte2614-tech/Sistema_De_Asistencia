@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!--
+  "Áreas y líderes" (D-030): pantalla exclusiva del tablero de área para crear áreas y
+  elegir su líder. No es el módulo general de usuarios — es apenas lo que este apartado
+  necesita para funcionar.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Áreas y líderes', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Administración</span>
+            <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Áreas y líderes</h1>
+            <p class="mt-3 max-w-[65ch] text-[14px] leading-[1.6] text-neutral-700">
+                Cada área tiene su propio tablero de equipo. El líder que elijas acá es quien
+                puede crear, mover y eliminar tarjetas en el tablero de esa área.
+            </p>
+        </div>
+        <a th:href="@{/admin/tablero-area}" class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">
+            Ver tableros por área
+        </a>
+    </section>
+
+    <section class="card-strong p-5">
+        <h3 class="m-0 mb-4 text-[17px]">Nueva área</h3>
+        <form th:action="@{/admin/tablero-area/administrar}" method="post"
+              class="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div class="flex min-w-0 flex-1 flex-col gap-1">
+                <label for="area-nombre" class="etiqueta-campo">Nombre</label>
+                <input id="area-nombre" name="nombre" type="text" required maxlength="120"
+                       class="input-linea" placeholder="Ej. Ventas">
+            </div>
+            <button type="submit" class="btn btn-primary px-[18px] py-3 text-[13px] uppercase tracking-[0.06em]">
+                Crear área
+            </button>
+        </form>
+    </section>
+
+    <section class="card overflow-x-auto p-0">
+        <table class="table">
+            <thead>
+            <tr>
+                <th class="pl-5">Área</th>
+                <th>Líder</th>
+                <th>Estado</th>
+                <th class="pr-5"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${areas}">
+                <td class="pl-5 font-heading" th:text="${a.nombre}">Área</td>
+                <td>
+                    <form th:action="@{/admin/tablero-area/administrar/{id}/lider(id=${a.id})}" method="post"
+                          class="flex items-center gap-2">
+                        <select name="liderId" class="input-linea sm:w-[220px]">
+                            <option value="">Sin asignar</option>
+                            <option th:each="u : ${candidatos}" th:value="${u.id}" th:text="${u.nombre}"
+                                    th:selected="${lideres.get(a.id) != null and u.id == a.coordinadorId}">
+                                Usuario
+                            </option>
+                        </select>
+                        <button type="submit" class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                            Guardar
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <span class="tag" th:classappend="${a.activo} ? 'tag-success' : 'tag-outline'"
+                          th:text="${a.activo} ? 'Activa' : 'Inactiva'">Estado</span>
+                </td>
+                <td class="pr-5">
+                    <form th:action="@{/admin/tablero-area/administrar/{id}/estado(id=${a.id})}" method="post" class="m-0">
+                        <input type="hidden" name="activo" th:value="${!a.activo}">
+                        <button type="submit" class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]"
+                                th:text="${a.activo} ? 'Desactivar' : 'Activar'">
+                            Cambiar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(areas)}">
+                <td colspan="4" class="p-6 text-center text-[13px] text-neutral-600">
+                    Todavía no hay ninguna área creada.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+</th:block>
+</body>
+</html>

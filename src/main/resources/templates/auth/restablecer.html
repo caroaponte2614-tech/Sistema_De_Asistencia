@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!--
+  Nueva contraseña a partir del token del correo.
+  El token viaja en un campo oculto: si viajara solo en la URL quedaría en el
+  historial del navegador y en los logs del proxy.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/auth-layout :: pagina('Nueva contraseña', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <span class="mb-3.5 text-[12px] uppercase tracking-[0.14em] text-[var(--color-accent-700)]">Recuperar acceso</span>
+    <h2 class="m-0 mb-2 text-[34px] tracking-[-0.02em]">Crea una contraseña nueva</h2>
+    <p class="m-0 mb-8 text-[15px] text-[var(--color-neutral-700)]">
+        Se cerrarán las demás sesiones abiertas con tu cuenta.
+    </p>
+
+    <div th:if="${not #lists.isEmpty(errores)}" class="aviso mb-6" role="alert">
+        <ul>
+            <li th:each="error : ${errores}" th:text="${error}">Error</li>
+        </ul>
+    </div>
+
+    <form th:action="@{/restablecer}" method="post" class="flex flex-col gap-[22px]" data-formulario-auth>
+        <input type="hidden" name="token" th:value="${token}">
+
+        <div class="flex flex-col gap-2">
+            <div class="flex items-baseline justify-between gap-3">
+                <label for="password" class="etiqueta-campo">Contraseña nueva</label>
+                <button type="button"
+                        class="cursor-pointer border-0 bg-transparent p-0 font-[var(--font-body)] text-[11px] uppercase tracking-[0.1em] text-[var(--color-accent-700)] hover:text-[var(--color-accent)]"
+                        data-revelar="password" aria-controls="password">Mostrar</button>
+            </div>
+            <input id="password" name="password" type="password" required autofocus
+                   placeholder="Mínimo 10 caracteres" autocomplete="new-password" class="input-linea">
+            <span class="text-[12px] text-[var(--color-neutral-600)]"
+                  th:text="|Mínimo ${longitudMinimaPassword} caracteres, con letras y números.|">
+                Mínimo 10 caracteres.
+            </span>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <label for="confirmPassword" class="etiqueta-campo">Repite la contraseña</label>
+            <input id="confirmPassword" name="confirmPassword" type="password" required
+                   placeholder="••••••••" autocomplete="new-password" class="input-linea">
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary flex w-full items-center gap-2.5 !justify-start px-[18px] py-4 text-[14px] uppercase tracking-[0.06em]"
+                data-etiqueta-envio="Guardando…">
+            <span class="flex-1 text-left">Guardar contraseña</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="square" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6"></path>
+            </svg>
+        </button>
+    </form>
+
+</th:block>
+</body>
+</html>

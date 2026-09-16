@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!--
+  Verificación pública de un certificado laboral: a dónde apunta el QR impreso en el
+  PDF. Sin sesión, datos enmascarados a propósito — ver CertificadoLaboralService.verificar.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/auth-layout :: pagina('Verificación de certificado', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <span class="mb-3.5 text-[12px] uppercase tracking-[0.14em] text-[var(--color-accent-700)]">School_Plus</span>
+    <h2 class="m-0 mb-2 text-[34px] tracking-[-0.02em]">Verificación de certificado</h2>
+
+    <div th:if="${resultado != null}">
+        <p class="m-0 mb-6 text-[15px] leading-[1.55] text-[var(--color-neutral-700)]">
+            Este código corresponde a un certificado laboral válido, emitido por School_Plus.
+        </p>
+        <dl class="m-0 mb-8 flex flex-col gap-3 text-[14px]">
+            <div>
+                <dt class="text-[11px] uppercase tracking-[0.1em] text-[var(--color-neutral-600)]">Nombre</dt>
+                <dd class="m-0" th:text="${resultado.nombreEnmascarado}">—</dd>
+            </div>
+            <div>
+                <dt class="text-[11px] uppercase tracking-[0.1em] text-[var(--color-neutral-600)]">Cédula</dt>
+                <dd class="m-0" th:text="${resultado.cedulaEnmascarada}">—</dd>
+            </div>
+            <div>
+                <dt class="text-[11px] uppercase tracking-[0.1em] text-[var(--color-neutral-600)]">Emitido</dt>
+                <dd class="m-0" th:text="${#temporals.format(resultado.emitidoEn, 'dd/MM/yyyy HH:mm')}">—</dd>
+            </div>
+        </dl>
+    </div>
+
+    <p th:if="${resultado == null}" class="m-0 mb-8 text-[15px] leading-[1.55] text-[var(--color-neutral-700)]">
+        El código <strong th:text="${codigo}">—</strong> no corresponde a ningún certificado emitido por School_Plus.
+    </p>
+
+</th:block>
+</body>
+</html>

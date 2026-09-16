@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<!--
+  Shell de la aplicación: sidebar fijo de 240 px + topbar + contenido.
+
+  ESTRUCTURA tomada de los prototipos de diseño (vistas_tailwind/filesFrn/portal-inicial.html) —
+  el sidebar, sus ítems, la topbar pegajosa y la rejilla de dos columnas del muro.
+  PIEL en Modernist (D-009), no los tokens índigo del prototipo: la aplicación no cambia
+  de aspecto al pasar el login.
+
+  El menú se pinta según CAPACIDADES, no según rol: se pregunta al mismo bean
+  `capacidades` que usan los @PreAuthorize, así que nunca aparece un enlace que al
+  pulsarlo daría 403. Los apartados que aún no existen se listan apagados, para que se
+  vea el mapa completo sin fingir que funcionan.
+-->
+<html th:fragment="pagina(titulo, contenido)" lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="|${titulo} · School_Plus|">School_Plus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,300;0,400;0,500;0,600;0,800;1,300&display=swap">
+    <link rel="stylesheet" th:href="@{/main.css}">
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+</head>
+<body class="m-0 min-h-screen bg-bg font-sans text-ink antialiased">
+
+<div class="lg:grid lg:grid-cols-[240px_1fr]">
+
+    <!-- ══ SIDEBAR ═══════════════════════════════════════════════════════ -->
+    <aside id="sidebar"
+           class="fixed inset-y-0 left-0 z-50 flex w-60 -translate-x-full flex-col border-r border-divider bg-surface shadow-lg transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:shadow-sm">
+
+        <a th:href="@{/portal}"
+           class="flex h-16 shrink-0 items-center gap-3 border-b border-divider px-5 no-underline hover:no-underline">
+            <span class="h-3.5 w-3.5 shrink-0 bg-accent"></span>
+            <span class="font-heading text-[15px] font-extrabold uppercase tracking-[0.16em] text-ink">School_Plus</span>
+        </a>
+
+        <nav aria-label="Navegación principal" class="flex-1 overflow-y-auto p-3">
+            <ul class="m-0 list-none space-y-1 p-0 text-[14px]">
+
+                <!-- El portal va primero: es la pestaña inicial de los cuatro roles. -->
+                <li th:replace="~{fragments/app-layout :: item(true, '/portal', 'Portal', ${seccion == 'portal'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(true, ${rutaPanel ?: '/mi-espacio'}, 'Panel', ${seccion == 'panel'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('SOLICITUD_CREAR')}, '/mi-espacio/solicitudes', 'Solicitudes', ${seccion == 'solicitudes'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('TABLERO_USAR')}, '/mi-espacio/tablero', 'Mi tablero', ${seccion == 'tablero'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('TABLERO_USAR')}, '/mi-espacio/tablero-area', 'Tablero de mi área', ${seccion == 'tablero-area'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('DOCUMENTO_PUBLICO_SUBIR')}, '/mi-espacio/documentos', 'Mis documentos', ${seccion == 'documentos'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ORGANIGRAMA_VER')}, '/mi-espacio/organigrama', 'Jerarquía', ${seccion == 'jerarquia'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('HORAS_EXTRA_VER')}, '/mi-espacio/horas-extras', 'Mis horas extra', ${seccion == 'horas-extra-mias'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CAPACITACION_VER')}, '/mi-espacio/capacitaciones', 'Capacitaciones', ${seccion == 'capacitaciones'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('DOCUMENTO_INSTITUCIONAL_VER')}, '/mi-espacio/documentos-institucionales', 'Documentos institucionales', ${seccion == 'documentos-institucionales'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('RECONOCIMIENTO_VER')}, '/mi-espacio/reconocimientos', 'Mis reconocimientos', ${seccion == 'reconocimientos'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('PERFIL_COLABORADOR_VER')}, '/mi-espacio/perfil', 'Mi identificación', ${seccion == 'perfil'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CERTIFICADO_LABORAL_SOLICITAR')}, '/mi-espacio/certificado-laboral', 'Certificado laboral', ${seccion == 'certificado-laboral'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('RECONOCIMIENTO_CREAR') or @capacidades.puede('HORAS_EXTRA_REGISTRAR') or @capacidades.puede('PERFIL_COLABORADOR_ADMINISTRAR')}, '/coordinacion/equipo', 'Mi equipo', ${seccion == 'equipo'}, ${null})}"></li>
+
+                <li class="pt-3">
+                    <span class="px-3 text-[10px] uppercase tracking-[0.14em] text-neutral-600">Aprobaciones</span>
+                </li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('SOLICITUD_APROBAR_PRIMERA')}, '/coordinacion/bandeja', 'Coordinación', ${seccion == 'bandeja-coord'}, ${pendientesCoordinacion})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('SOLICITUD_APROBAR_SEGUNDA')}, '/talento-humano/bandeja', 'Talento Humano', ${seccion == 'bandeja-rrhh'}, ${pendientesRrhh})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('HORAS_EXTRA_REGISTRAR')}, '/coordinacion/horas-extras', 'Horas extra del equipo', ${seccion == 'horas-extra-coordinacion'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('HORAS_EXTRA_APROBAR')}, '/talento-humano/horas-extras', 'Horas extra', ${seccion == 'horas-extra-bandeja'}, ${pendientesHorasExtra})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('HORAS_EXTRA_APROBAR')}, '/talento-humano/horas-extras/historial', 'Historial horas extra', ${seccion == 'horas-extra-historial'}, ${null})}"></li>
+
+                <li th:if="${@capacidades.puede('ORGANIGRAMA_ADMINISTRAR') or @capacidades.puede('USUARIO_ADMINISTRAR') or @capacidades.puede('CAPACITACION_ADMINISTRAR') or @capacidades.puede('TABLERO_VER')}" class="pt-3">
+                    <span class="px-3 text-[10px] uppercase tracking-[0.14em] text-neutral-600">Administración</span>
+                </li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('TABLERO_VER')}, '/admin/tablero-area', 'Tableros por área', ${seccion == 'tablero-area-admin'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('TABLERO_VER')}, '/admin/tablero-area/administrar', 'Áreas y líderes', ${seccion == 'tablero-area-administrar'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('USUARIO_ADMINISTRAR')}, '/talento-humano/usuarios', 'Usuarios', ${seccion == 'usuarios'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ORGANIGRAMA_ADMINISTRAR')}, '/talento-humano/organigrama', 'Editar organigrama', ${seccion == 'organigrama'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CAPACITACION_ADMINISTRAR')}, '/talento-humano/capacitaciones', 'Cursos', ${seccion == 'capacitaciones-admin'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('DOCUMENTO_INSTITUCIONAL_ADMINISTRAR')}, '/talento-humano/documentos-institucionales', 'Documentos institucionales', ${seccion == 'documentos-institucionales-admin'}, ${null})}"></li>
+
+                <li class="pt-3">
+                    <span class="px-3 text-[10px] uppercase tracking-[0.14em] text-neutral-600">Próximamente</span>
+                </li>
+                <li th:replace="~{fragments/app-layout :: pendiente('Reportes')}"></li>
+                <li th:replace="~{fragments/app-layout :: pendiente('Directorio')}"></li>
+            </ul>
+        </nav>
+
+        <div class="border-t border-divider p-3">
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit"
+                        class="btn btn-secondary w-full text-[12px] uppercase tracking-[0.08em]">Cerrar sesión</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Clase del sistema y no bg-ink/40: los colores del tema son var(), y los
+         modificadores de opacidad de Tailwind no funcionan sobre una variable. -->
+    <div id="overlay" class="overlay-menu fixed inset-0 z-40 hidden lg:hidden"></div>
+
+    <!-- ══ COLUMNA PRINCIPAL ═════════════════════════════════════════════ -->
+    <div class="min-w-0">
+
+        <header class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-divider bg-bg px-4 shadow-sm sm:px-6">
+            <button type="button" id="abrir-menu" aria-label="Abrir menú"
+                    class="btn btn-secondary lg:hidden">☰</button>
+            <h1 class="m-0 truncate text-[18px] tracking-[-0.01em]" th:text="${titulo}">School_Plus</h1>
+            <div class="ml-auto flex items-center gap-3 text-[13px]">
+                <span class="hidden text-neutral-700 sm:inline" sec:authentication="name">correo</span>
+
+                <!-- ══ CAMPANITA DE NOTIFICACIONES ═══════════════════════════ -->
+                <div class="relative">
+                    <button type="button" id="campana-boton" aria-label="Notificaciones"
+                            aria-haspopup="true" aria-expanded="false"
+                            class="btn btn-secondary relative h-9 w-9 shrink-0 p-0">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 4a5 5 0 0 0-5 5c0 5.5-2 7-2 7h14s-2-1.5-2-7a5 5 0 0 0-5-5Z"></path>
+                            <path d="M10 19a2 2 0 0 0 4 0"></path>
+                        </svg>
+                        <span id="campana-contador"
+                              class="tag tag-accent absolute -right-1.5 -top-1.5 hidden min-w-[16px] justify-center px-1 py-0 text-[10px] leading-[16px]">0</span>
+                    </button>
+
+                    <div id="campana-panel"
+                         class="card-strong absolute right-0 top-full z-40 mt-2 hidden w-80 max-w-[calc(100vw-2rem)] flex-col gap-0 overflow-hidden p-0"
+                         role="menu" aria-label="Notificaciones">
+                        <div class="flex items-center justify-between border-b border-divider px-4 py-3">
+                            <span class="card-kicker">Notificaciones</span>
+                            <button type="button" id="campana-marcar-todas"
+                                    class="cursor-pointer border-0 bg-transparent p-0 text-[11px] uppercase tracking-[0.06em] text-accent-700 hover:underline">
+                                Marcar todas leídas
+                            </button>
+                        </div>
+                        <div id="campana-lista" class="max-h-96 overflow-y-auto"></div>
+                        <p id="campana-vacio" class="m-0 hidden px-4 py-6 text-center text-[13px] text-neutral-600">
+                            Sin notificaciones todavía.
+                        </p>
+                    </div>
+                </div>
+
+                <a th:href="@{/mi-cuenta}" title="Mi cuenta"
+                   class="block h-9 w-9 shrink-0 overflow-hidden rounded-full border border-divider shadow-sm transition-shadow hover:shadow-md">
+                    <img th:if="${tieneFotoPerfil}" th:src="@{/mi-cuenta/foto}" alt="Mi cuenta"
+                         class="h-full w-full object-cover">
+                    <span th:unless="${tieneFotoPerfil}"
+                          class="grid h-full w-full place-items-center bg-accent text-[12px] font-extrabold text-bg"
+                          th:text="${#strings.toUpperCase(#strings.substring(#authentication.name, 0, 2))}">AL</span>
+                </a>
+            </div>
+        </header>
+
+        <main class="mx-auto flex w-full max-w-[1180px] flex-col gap-8 px-4 py-8 sm:px-8">
+            <div th:if="${aviso}" class="aviso aviso-ok" role="status" th:text="${aviso}">Aviso</div>
+            <div th:if="${error}" class="aviso" role="alert" th:text="${error}">Error</div>
+
+            <th:block th:replace="${contenido}"/>
+        </main>
+    </div>
+</div>
+
+<!-- ══ MODAL GENÉRICO (reemplaza alert()/confirm() nativos: "localhost dice") ══ -->
+<div id="modal-backdrop" class="dialog-backdrop hidden" role="presentation">
+    <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="modal-titulo" aria-describedby="modal-cuerpo">
+        <p id="modal-titulo" class="dialog-title">Aviso</p>
+        <p id="modal-cuerpo" class="dialog-body"></p>
+        <div class="dialog-actions">
+            <button type="button" id="modal-cancelar" class="btn btn-secondary hidden px-4 py-2 text-[12px] uppercase tracking-[0.06em]">Cancelar</button>
+            <button type="button" id="modal-aceptar" class="btn btn-primary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">Aceptar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Plantilla de una fila de la campanita: el JS la clona por cada notificación. -->
+<template id="plantilla-notificacion">
+    <a class="block border-b border-divider px-4 py-3 text-[13px] no-underline hover:bg-neutral-200 hover:no-underline last:border-b-0" data-notificacion>
+        <p class="m-0 font-heading text-[13px] text-ink" data-notificacion-titulo>Título</p>
+        <p class="m-0 mt-0.5 text-[12px] text-neutral-700" data-notificacion-cuerpo></p>
+        <p class="m-0 mt-1 text-[11px] text-neutral-500" data-notificacion-fecha></p>
+    </a>
+</template>
+
+<script th:src="@{/js/core.js}" defer></script>
+<script th:src="@{/js/shell.js}" defer></script>
+<script th:src="@{/js/muro.js}" defer></script>
+<script th:src="@{/js/tablero.js}" defer></script>
+<script th:src="@{/js/tablero-area.js}" defer></script>
+<script th:src="@{/js/carousel.js}" defer></script>
+<script th:src="@{/js/capacitaciones.js}" defer></script>
+<script th:src="@{/js/catalogo-filtrable.js}" defer></script>
+<script th:src="@{/js/organigrama.js}" defer></script>
+<script th:src="@{/js/perfil.js}" defer></script>
+</body>
+
+<!-- ── Fragmentos del menú ───────────────────────────────────────────────── -->
+
+<!--
+  Un ítem del sidebar. Si `visible` es falso no se pinta nada: no hay enlaces muertos.
+  `contador` pinta la píldora de pendientes cuando hay algo que resolver.
+-->
+<li th:fragment="item(visible, ruta, etiqueta, activo, contador)" th:if="${visible}">
+    <a th:href="@{${ruta}}"
+       th:classappend="${activo} ? 'bg-accent-200 font-semibold text-accent-800 border-l-[3px] border-accent pl-[9px]'
+                                 : 'text-neutral-700 hover:bg-neutral-200 hover:text-ink'"
+       class="flex items-center gap-3 rounded-md px-3 py-2.5 no-underline transition-colors hover:no-underline">
+        <span class="h-1.5 w-1.5 shrink-0 bg-current" aria-hidden="true"></span>
+        <span th:text="${etiqueta}">Sección</span>
+        <span th:if="${contador != null and contador > 0}"
+              class="tag tag-accent ml-auto" th:text="${contador}">0</span>
+    </a>
+</li>
+
+<!-- Apartado del mapa que todavía no existe. Se ve, pero no engaña: no es un enlace. -->
+<li th:fragment="pendiente(etiqueta)">
+    <span class="flex cursor-not-allowed items-center gap-3 px-3 py-2.5 text-neutral-500"
+          th:title="|${etiqueta}: llega en un hito posterior|">
+        <span class="h-1.5 w-1.5 shrink-0 border border-neutral-500" aria-hidden="true"></span>
+        <span th:text="${etiqueta}">Sección</span>
+    </span>
+</li>
+</html>

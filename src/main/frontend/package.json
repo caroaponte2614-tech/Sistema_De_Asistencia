@@ -1,0 +1,17 @@
+{
+  "name": "school-plus-frontend",
+  "version": "0.1.0",
+  "description": "Compilación de TailwindCSS para School_Plus",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "build": "tailwindcss -i ./styles.css -o ../resources/static/main.css --minify",
+    "watch": "tailwindcss --watch -i ./styles.css -o ../resources/static/main.css"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.24",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19"
+  }
+}

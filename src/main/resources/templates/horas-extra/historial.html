@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!-- Historial completo para Talento Humano: todo lo que cada coordinador registró, decidido o no. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Historial de horas extra', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Talento Humano</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Historial de horas extra</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 max-w-[70ch] text-[15px] leading-[1.6] text-neutral-700">
+            Todo lo que los coordinadores registraron, de cualquier equipo, ya esté
+            pendiente, aprobado o denegado. La bandeja de
+            <a th:href="@{/talento-humano/horas-extras}">pendientes por resolver</a> solo
+            muestra lo que todavía no tiene decisión.
+        </p>
+    </section>
+
+    <section>
+        <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(registros)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="pl-5">Colaborador</th>
+                    <th>Registradas por</th>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Horas</th>
+                    <th>Estado</th>
+                    <th>Decidido por</th>
+                    <th class="pr-5">Motivo de la negativa</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${registros}">
+                    <td class="pl-5" th:text="${r.colaborador.nombre}">Colaborador</td>
+                    <td th:text="${r.registradoPor.nombre}">Coordinador</td>
+                    <td th:text="${#temporals.format(r.fecha, 'dd/MM/yyyy')}">01/01/2026</td>
+                    <td th:text="${r.recargo.nombre}">Diurna</td>
+                    <td th:text="${#numbers.formatDecimal(r.horas, 1, 2)}">2</td>
+                    <td>
+                        <span class="tag uppercase tracking-[0.06em]"
+                              th:classappend="${r.estado.name() == 'APROBADO'} ? 'tag-success'
+                                            : (${r.estado.name() == 'RECHAZADO'} ? 'tag-danger' : 'tag-outline')"
+                              th:text="${etiquetasEstado.get(r.estado)}">Estado</span>
+                    </td>
+                    <td th:text="${r.decididoPor != null ? r.decididoPor.nombre : '—'}">—</td>
+                    <td class="pr-5 text-neutral-700" th:text="${r.motivoRechazo ?: '—'}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p th:if="${#lists.isEmpty(registros)}" class="text-[14px] text-neutral-700">
+            Todavía no hay horas extra registradas por ningún coordinador.
+        </p>
+    </section>
+
+</th:block>
+</body>
+</html>

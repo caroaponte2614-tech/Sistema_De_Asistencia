@@ -1,0 +1,19 @@
+target/
+
+.env
+*.log
+
+# Frontend (package-lock.json SÍ se versiona: build reproducible)
+src/main/frontend/node_modules/
+# Salida compilada de Tailwind: la genera el build, no se versiona.
+src/main/resources/static/main.css
+
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Archivos subidos por los usuarios (almacenamiento local, STORAGE_PATH).
+uploads/
+# Librerías de terceros copiadas por el build de frontend (npm run build).
+src/main/resources/static/vendor/

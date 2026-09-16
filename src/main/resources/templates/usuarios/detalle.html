@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<!-- Ficha completa de un colaborador para RH/ADMIN (D-021): datos, foto, roles, jefe
+     directo y los dos tipos de documentos. El portafolio público es de solo lectura acá
+     —cada quien administra el suyo—; el expediente restringido sí lo maneja RH entero. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina(${usuario.nombre}, ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Talento Humano</span>
+            <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]" th:text="${usuario.nombre}">Nombre</h1>
+            <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="tag" th:classappend="${usuario.estado.name() == 'ACTIVO'} ? 'tag-success' : 'tag-outline'"
+                  th:text="${usuario.estado.name() == 'ACTIVO'} ? 'Activo' : 'Inactivo'">Estado</span>
+            <form th:action="@{/talento-humano/usuarios/{id}/estado(id=${usuario.id})}" method="post" class="m-0">
+                <input type="hidden" name="nuevoEstado"
+                       th:value="${usuario.estado.name() == 'ACTIVO'} ? 'INACTIVO' : 'ACTIVO'">
+                <button type="submit" class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]"
+                        th:text="${usuario.estado.name() == 'ACTIVO'} ? 'Desactivar' : 'Activar'">
+                    Desactivar
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]">
+
+        <!-- ══ FOTO ════════════════════════════════════════════════════════ -->
+        <section class="card-strong items-center p-6 text-center">
+            <span class="card-kicker self-start">Foto de perfil</span>
+
+            <div class="my-4 h-32 w-32 shrink-0 overflow-hidden rounded-full border border-divider shadow-md">
+                <img th:if="${tieneFoto}" th:src="@{/talento-humano/usuarios/{id}/foto(id=${usuario.id})}"
+                     alt="Foto de perfil" class="h-full w-full object-cover">
+                <span th:unless="${tieneFoto}"
+                      class="grid h-full w-full place-items-center bg-accent text-[28px] font-extrabold text-bg"
+                      th:text="${#strings.toUpperCase(#strings.substring(usuario.nombre, 0, 2))}">AL</span>
+            </div>
+
+            <form th:action="@{/talento-humano/usuarios/{id}/foto(id=${usuario.id})}" method="post"
+                  enctype="multipart/form-data" class="flex w-full flex-col gap-3">
+                <input name="archivo" type="file" required accept="image/jpeg,image/png,image/webp" class="input">
+                <button type="submit" class="btn btn-primary w-full py-2.5 text-[12px] uppercase tracking-[0.06em]">
+                    Subir foto
+                </button>
+            </form>
+            <form th:if="${tieneFoto}" th:action="@{/talento-humano/usuarios/{id}/foto/eliminar(id=${usuario.id})}"
+                  method="post" class="mt-2 w-full">
+                <button type="submit" class="btn btn-secondary w-full py-2.5 text-[12px] uppercase tracking-[0.06em]">
+                    Eliminar foto
+                </button>
+            </form>
+        </section>
+
+        <!-- ══ DATOS BÁSICOS ═══════════════════════════════════════════════ -->
+        <section class="card-strong p-6">
+            <span class="card-kicker">Cargo e información</span>
+
+            <form th:action="@{/talento-humano/usuarios/{id}(id=${usuario.id})}" method="post"
+                  class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label class="etiqueta-campo" for="nombre">Nombre completo</label>
+                    <input id="nombre" name="nombre" type="text" required maxlength="110" class="input"
+                           th:value="${usuario.nombre}">
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="etiqueta-campo" for="email">Correo</label>
+                    <input id="email" name="email" type="email" required maxlength="180" class="input"
+                           th:value="${usuario.email}">
+                </div>
+                <div>
+                    <label class="etiqueta-campo" for="cedula">Cédula</label>
+                    <input id="cedula" name="cedula" type="text" required maxlength="12" class="input"
+                           th:value="${usuario.cedula}">
+                </div>
+                <div>
+                    <label class="etiqueta-campo" for="telefono">Teléfono</label>
+                    <input id="telefono" name="telefono" type="text" required maxlength="15" class="input"
+                           th:value="${usuario.telefono}">
+                </div>
+                <div>
+                    <label class="etiqueta-campo" for="sedeId">Sede</label>
+                    <select id="sedeId" name="sedeId" class="input">
+                        <option value="">— Sin asignar —</option>
+                        <option th:each="s : ${sedes}" th:value="${s.id}" th:text="${s.nombre}"
+                                th:selected="${usuario.sede != null and usuario.sede.id == s.id}">Sede</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="etiqueta-campo" for="cargoId">Cargo</label>
+                    <select id="cargoId" name="cargoId" class="input">
+                        <option value="">— Sin asignar —</option>
+                        <option th:each="c : ${cargosDisponibles}" th:value="${c.id}" th:text="${c.nombre}"
+                                th:selected="${usuario.cargo != null and usuario.cargo.id == c.id}">Cargo</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="etiqueta-campo" for="areaId">Área</label>
+                    <select id="areaId" name="areaId" class="input">
+                        <option value="">— Sin asignar —</option>
+                        <option th:each="a : ${areas}" th:value="${a.id}" th:text="${a.nombre}"
+                                th:selected="${usuario.area != null and usuario.area.id == a.id}">Área</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="etiqueta-campo" for="fechaIngreso">Fecha de ingreso</label>
+                    <input id="fechaIngreso" name="fechaIngreso" type="date" class="input"
+                           th:value="${usuario.fechaIngreso}">
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="etiqueta-campo" for="fechaNacimiento">Fecha de nacimiento</label>
+                    <input id="fechaNacimiento" name="fechaNacimiento" type="date" class="input"
+                           th:value="${usuario.fechaNacimiento}">
+                </div>
+                <div class="sm:col-span-2">
+                    <button type="submit" class="btn btn-primary w-full py-3 text-[13px] uppercase tracking-[0.06em]">
+                        Guardar datos
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+
+        <!-- ══ ROLES ═══════════════════════════════════════════════════════ -->
+        <section class="card-strong p-6">
+            <span class="card-kicker">Roles</span>
+            <form th:action="@{/talento-humano/usuarios/{id}/roles(id=${usuario.id})}" method="post"
+                  class="mt-4 flex flex-col gap-3">
+                <label th:each="r : ${roles}" class="flex items-center gap-2 text-[14px]">
+                    <input type="checkbox" name="roles" th:value="${r.codigo}"
+                           th:checked="${codigosRolDelUsuario.contains(r.codigo)}">
+                    <span th:text="${r.nombre}">Rol</span>
+                </label>
+                <button type="submit" class="btn btn-primary mt-1 w-full py-2.5 text-[12px] uppercase tracking-[0.06em]">
+                    Guardar roles
+                </button>
+            </form>
+        </section>
+
+        <!-- ══ JEFE DIRECTO ════════════════════════════════════════════════ -->
+        <section class="card-strong p-6">
+            <span class="card-kicker">Jefe directo</span>
+            <p class="mt-3 text-[14px] text-neutral-700">
+                Actual:
+                <strong th:text="${usuario.coordinador != null ? usuario.coordinador.nombre : '— Sin jefe —'}">Jefe</strong>
+            </p>
+            <p th:if="${jefeSugerido != null}" class="m-0 text-[12px] text-neutral-600">
+                Su cargo sugiere: <span th:text="${jefeSugerido.nombre}">Sugerido</span>
+            </p>
+            <form th:action="@{/talento-humano/usuarios/{id}/jefe(id=${usuario.id})}" method="post"
+                  class="mt-4 flex flex-col gap-3">
+                <select name="nuevoJefeId" class="input">
+                    <option value="">— Sin jefe —</option>
+                    <option th:each="u : ${candidatosAJefe}" th:value="${u.id}" th:text="${u.nombre}"
+                            th:selected="${usuario.coordinador != null and usuario.coordinador.id == u.id}">Jefe</option>
+                </select>
+                <button type="submit" class="btn btn-primary w-full py-2.5 text-[12px] uppercase tracking-[0.06em]">
+                    Reasignar
+                </button>
+            </form>
+        </section>
+    </div>
+
+    <!-- ══ CAPACITACIONES (solo lectura) ═══════════════════════════════════ -->
+    <section>
+        <h2 class="m-0 mb-1 text-[22px]">Capacitaciones</h2>
+        <p class="m-0 mb-4 text-[13px] text-neutral-600">
+            Progreso de esta persona sobre el catálogo de cursos.
+        </p>
+
+        <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(cursosInscripciones)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="pl-5">Curso</th>
+                    <th>Video</th>
+                    <th>Quiz</th>
+                    <th>Mejor nota</th>
+                    <th class="pr-5">Completado</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="i : ${cursosInscripciones}">
+                    <td class="pl-5" th:text="${i.curso.titulo}">Curso</td>
+                    <td>
+                        <span class="tag uppercase tracking-[0.06em]"
+                              th:classappend="${i.videoCompletadoEn != null} ? 'tag-neutral' : 'tag-outline'"
+                              th:text="${i.videoCompletadoEn != null} ? 'Visto' : 'Pendiente'">Video</span>
+                    </td>
+                    <td>
+                        <span class="tag uppercase tracking-[0.06em]"
+                              th:classappend="${i.quizAprobado} ? 'tag-neutral' : 'tag-outline'"
+                              th:text="${i.quizAprobado} ? 'Aprobado' : 'Pendiente'">Quiz</span>
+                    </td>
+                    <td th:text="${i.mejorNota != null} ? ${i.mejorNota} : '—'">—</td>
+                    <td class="pr-5"
+                        th:text="${i.completadoEn != null} ? ${#temporals.format(i.completadoEn, 'dd/MM/yyyy')} : '—'">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p th:if="${#lists.isEmpty(cursosInscripciones)}" class="text-[14px] text-neutral-700">
+            Todavía no ha empezado ninguna capacitación.
+        </p>
+    </section>
+
+    <!-- ══ DOCUMENTOS PÚBLICOS (solo lectura) ═════════════════════════════ -->
+    <section>
+        <h2 class="m-0 mb-1 text-[22px]">Portafolio público</h2>
+        <p class="m-0 mb-4 text-[13px] text-neutral-600">
+            Hoja de vida, certificados y soportes. Los administra el propio colaborador;
+            acá solo se consultan.
+        </p>
+
+        <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(documentosPublicos)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="pl-5">Categoría</th>
+                    <th>Título</th>
+                    <th>Subido</th>
+                    <th class="pr-5">Descargar</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${documentosPublicos}">
+                    <td class="pl-5">
+                        <span class="tag tag-outline uppercase tracking-[0.06em]" th:text="${d.categoria.nombre}">Cat</span>
+                    </td>
+                    <td th:text="${d.titulo}">Título</td>
+                    <td th:text="${#temporals.format(d.creadoEn, 'dd/MM/yyyy')}">01/01/2026</td>
+                    <td class="pr-5">
+                        <a th:href="@{/talento-humano/usuarios/{id}/documentos/{docId}/descargar(id=${usuario.id},docId=${d.id})}"
+                           class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                            Descargar
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p th:if="${#lists.isEmpty(documentosPublicos)}" class="text-[14px] text-neutral-700">
+            Todavía no subió ningún documento a su portafolio.
+        </p>
+    </section>
+
+    <!-- ══ EXPEDIENTE RESTRINGIDO ══════════════════════════════════════════ -->
+    <section>
+        <h2 class="m-0 mb-1 text-[22px]">Expediente restringido</h2>
+        <p class="m-0 mb-4 text-[13px] text-neutral-600">
+            Contrato, afiliaciones, exámenes, actas. Solo Talento Humano y ADMIN lo ven y
+            lo administran.
+        </p>
+
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-[320px_1fr]">
+            <div class="card-strong p-6">
+                <span class="card-kicker">Subir documento</span>
+                <form th:action="@{/talento-humano/usuarios/{id}/documentos/restringidos(id=${usuario.id})}"
+                      method="post" enctype="multipart/form-data" class="mt-4 flex flex-col gap-4">
+                    <div>
+                        <label class="etiqueta-campo" for="categoriaCodigo">Categoría</label>
+                        <select id="categoriaCodigo" name="categoriaCodigo" required class="input">
+                            <option th:each="c : ${categoriasRestringidas}" th:value="${c.codigo}" th:text="${c.nombre}">Cat</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="etiqueta-campo" for="titulo">Título</label>
+                        <input id="titulo" name="titulo" type="text" required maxlength="200" class="input">
+                    </div>
+                    <div>
+                        <label class="etiqueta-campo" for="descripcion">Descripción (opcional)</label>
+                        <textarea id="descripcion" name="descripcion" maxlength="500" rows="2" class="input"></textarea>
+                    </div>
+                    <div>
+                        <label class="etiqueta-campo" for="archivo-restringido">Archivo</label>
+                        <input id="archivo-restringido" name="archivo" type="file" required class="input">
+                        <p class="m-0 mt-1 text-[11px] text-neutral-600">Máximo 10 MB.</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full py-3 text-[13px] uppercase tracking-[0.06em]">
+                        Subir
+                    </button>
+                </form>
+            </div>
+
+            <div>
+                <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(documentosRestringidos)}">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th class="pl-5">Categoría</th>
+                            <th>Título</th>
+                            <th>Subido</th>
+                            <th class="pr-5">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="d : ${documentosRestringidos}">
+                            <td class="pl-5">
+                                <span class="tag tag-outline uppercase tracking-[0.06em]" th:text="${d.categoria.nombre}">Cat</span>
+                            </td>
+                            <td th:text="${d.titulo}">Título</td>
+                            <td th:text="${#temporals.format(d.creadoEn, 'dd/MM/yyyy')}">01/01/2026</td>
+                            <td class="pr-5">
+                                <div class="flex flex-wrap gap-2">
+                                    <a th:href="@{/talento-humano/usuarios/{id}/documentos/{docId}/descargar(id=${usuario.id},docId=${d.id})}"
+                                       class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                                        Descargar
+                                    </a>
+                                    <form th:action="@{/talento-humano/usuarios/{id}/documentos/{docId}/eliminar(id=${usuario.id},docId=${d.id})}"
+                                          method="post" class="m-0">
+                                        <button type="submit"
+                                                class="btn btn-secondary px-3 py-1.5 text-[12px] uppercase tracking-[0.06em]">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p th:if="${#lists.isEmpty(documentosRestringidos)}" class="text-[14px] text-neutral-700">
+                    Sin documentos de expediente todavía.
+                </p>
+            </div>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

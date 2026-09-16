@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!-- Mis reconocimientos y llamados de atención — de solo lectura, los registra el coordinador o Talento Humano. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Mis reconocimientos', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Reconocimientos</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Mis reconocimientos</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+    </section>
+
+    <section class="flex flex-col gap-4">
+        <article th:each="r : ${registros}" class="card p-5"
+                 th:classappend="${r.tipo.name() == 'RECONOCIMIENTO'} ? 'border-l-[3px] border-accent' : 'border-l-[3px] border-neutral-400'">
+            <div class="flex flex-wrap items-baseline justify-between gap-3">
+                <span class="card-kicker" th:text="${r.tipo.name() == 'RECONOCIMIENTO'} ? 'Reconocimiento' : 'Llamado de atención'">Tipo</span>
+                <span class="text-[12px] text-neutral-600" th:text="${#temporals.format(r.fecha, 'dd/MM/yyyy')}">01/01/2026</span>
+            </div>
+            <h2 class="m-0 mt-1 text-[18px]" th:text="${r.titulo}">Título</h2>
+            <p class="m-0 mt-2 whitespace-pre-line text-[14px] text-neutral-700" th:text="${r.descripcion}">Descripción</p>
+            <p class="m-0 mt-2 text-[12px] text-neutral-600">Registrado por <span th:text="${r.registradoPor.nombre}">—</span></p>
+            <a th:if="${r.archivoSoporteClave != null}" th:href="@{'/reconocimientos/' + ${r.id} + '/soporte'}"
+               class="mt-2 inline-block text-[13px]">Ver adjunto</a>
+        </article>
+
+        <p th:if="${#lists.isEmpty(registros)}" class="text-[14px] text-neutral-700">
+            Todavía no tienes ningún registro.
+        </p>
+    </section>
+
+</th:block>
+</body>
+</html>

@@ -1,0 +1,559 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   MODERNIST — sistema de diseño de TODA la aplicación.
+
+   Origen: los prototipos de diseño (login/_ds/modernist/styles.css)
+           los prototipos de diseño (login/Login.dc.html) (bloque <helmet><style>)
+
+   Los tokens se copian TAL CUAL del prototipo. Decisión del usuario (2026-08-26):
+   manda este sistema en la aplicación entera —autenticación, paneles, sidebar,
+   tablero y muro—, no solo en el login. Ver docs/DECISIONES.md D-009 y
+   docs/DECISIONES.md
+
+   Este archivo es la ÚNICA fuente de verdad de los tokens: `tailwind.config.js`
+   apunta a estas variables en vez de repetir los valores.
+
+   La familia Archivo NO se importa aquí con @import: se enlaza desde el <head> de
+   las plantillas, porque la CSP de SecurityConfig permite fonts.googleapis.com y un
+   @import dentro del CSS compilado quedaría fuera del orden que exige PostCSS.
+   ========================================================================== */
+
+@layer base {
+  :root {
+    /* Paleta azul de School_Plus (D-033). Cambiar el tema es tocar SOLO este bloque:
+       componentes, utilidades de Tailwind y vistas leen estas variables. */
+    --color-bg: #eff6ff;          /* fondo suave */
+    --color-surface: #ffffff;
+    --color-text: #0f172a;
+    --color-accent: #2563eb;      /* primario */
+    --color-accent-2: #0ea5e9;    /* acento */
+    --color-divider: color-mix(in srgb, #0f172a 10%, transparent);
+
+    /* Neutros fríos (escala slate): acompañan al azul sin ensuciarlo. */
+    --color-neutral-100: #f1f5f9;
+    --color-neutral-200: #e2e8f0;
+    --color-neutral-300: #cbd5e1;
+    --color-neutral-400: #94a3b8;
+    --color-neutral-500: #64748b;
+    --color-neutral-600: #475569;
+    --color-neutral-700: #334155;
+    --color-neutral-800: #1e293b;
+    --color-neutral-900: #0f172a;
+
+    /* Primario. 600 = hover, 800 = oscuro, 100 = claro. El DEFAULT (#2563eb) da 5,2:1
+       con texto blanco encima; 700 y 800 pasan AA como texto sobre el fondo suave. */
+    --color-accent-100: #dbeafe;
+    --color-accent-200: #bfdbfe;
+    --color-accent-300: #93c5fd;
+    --color-accent-400: #60a5fa;
+    --color-accent-500: #3b82f6;
+    --color-accent-600: #1d4ed8;
+    --color-accent-700: #1e40af;
+    --color-accent-800: #1e3a8a;
+    --color-accent-900: #172554;
+
+    /* Acento celeste. Decorativo: #0ea5e9 NO pasa AA con texto blanco; para texto
+       sobre fondo claro usar 700 u 800. */
+    --color-accent-2-100: #e0f2fe;
+    --color-accent-2-200: #bae6fd;
+    --color-accent-2-300: #7dd3fc;
+    --color-accent-2-400: #38bdf8;
+    --color-accent-2-500: #0ea5e9;
+    --color-accent-2-600: #0284c7;
+    --color-accent-2-700: #0369a1;
+    --color-accent-2-800: #075985;
+    --color-accent-2-900: #0c4a6e;
+
+    /* Semánticos: no cambian con la marca. Los tonos base y los 800 pasan AA (4,5:1)
+       como texto sobre blanco y sobre su propio fondo 100. */
+    --color-success: #15803d;
+    --color-success-100: #dcfce7;
+    --color-success-800: #166534;
+    --color-danger: #b91c1c;
+    --color-danger-100: #fee2e2;
+    --color-danger-800: #991b1b;
+    --color-warning: #b45309;
+    --color-warning-100: #fef3c7;
+    --color-warning-800: #92400e;
+
+    --font-heading: "Archivo", system-ui, sans-serif;
+    --font-heading-weight: 800;
+    --font-body: "Archivo", system-ui, sans-serif;
+
+    --space-1: 4.0px;
+    --space-2: 8.0px;
+    --space-3: 12.0px;
+    --space-4: 16.0px;
+    --space-6: 24.0px;
+    --space-8: 32.0px;
+
+    /* Reforma 2026-08-28: de esquinas vivas (look editorial) a redondeadas — el
+       ajuste que más pesa en que la aplicación se sienta "moderna" en vez de
+       brutalista. Las sombras suben un poco de peso porque ya no hay un trazo de
+       2px sólido cargando la definición de las cajas. */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    --shadow-sm: 0 1px 3px color-mix(in srgb, #0f172a 8%, transparent);
+    --shadow-md: 0 4px 16px color-mix(in srgb, #0f172a 10%, transparent);
+    --shadow-lg: 0 16px 40px color-mix(in srgb, #0f172a 16%, transparent);
+  }
+
+  /* Escala tipográfica del sistema. Ahora que gobierna toda la aplicación, la base
+     tiene que estar puesta: Tailwind preflight deja los encabezados sin tamaño. */
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.55;
+    font-weight: 400;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: var(--font-heading-weight);
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    margin: 0 0 var(--space-2);
+  }
+  h1 { font-size: 42px; }
+  h2 { font-size: 32px; }
+  h3 { font-size: 25px; }
+  h4 { font-size: 20px; }
+  h5 { font-size: 16px; }
+  h6 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+  p { margin: 0 0 var(--space-3); }
+  img { display: block; max-width: 100%; }
+  figure { margin: 0; }
+  figcaption {
+    font-size: 11px; margin-top: var(--space-1);
+    color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  }
+
+  /* Origen: bloque <helmet><style> de "Login.dc.html" */
+  a {
+    color: var(--color-accent-700);
+    text-decoration: none;
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  :focus { outline: none; }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  ::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
+}
+
+@layer components {
+  /* — botones — */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer; text-decoration: none;
+    font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+    font-size: 14px; line-height: 1.2; color: var(--color-text);
+    background: transparent; border: 1px solid transparent;
+    padding: var(--space-2) calc(var(--space-3) * 1.2);
+    border-radius: var(--radius-md);
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease,
+                box-shadow .15s ease, transform .08s ease;
+  }
+  .btn svg { display: block; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn:active:not(:disabled) { transform: translateY(1px); }
+  .btn-primary { background: var(--color-accent); color: var(--color-surface); box-shadow: var(--shadow-sm); }
+  .btn-primary:hover { background: var(--color-accent-600); color: var(--color-surface); text-decoration: none; box-shadow: var(--shadow-md); }
+  .btn-primary:active { background: var(--color-accent-700); box-shadow: none; }
+  .btn-secondary { border-color: var(--color-divider); }
+  .btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); border-color: color-mix(in srgb, var(--color-text) 35%, transparent); }
+  .btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
+  .btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
+  .btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+
+  /* — formularios — */
+  .field > label {
+    display: block; font-size: 12px; margin-bottom: 5px;
+    color: color-mix(in srgb, var(--color-text) 70%, transparent);
+  }
+  .input {
+    width: 100%; min-height: 36px; padding: 6px 10px; font: inherit;
+    font-size: 14px; color: var(--color-text); caret-color: var(--color-accent);
+    background: var(--color-surface);
+    border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+  .input:focus-visible { border-color: var(--color-accent); outline-offset: 0; box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 18%, transparent); }
+
+  /* Variante subrayada del prototipo del login: sin caja, solo la línea inferior.
+     Origen: "Login.dc.html", inputs #email y #password. */
+  .input-linea {
+    width: 100%; border: 0; border-bottom: 2px solid var(--color-divider);
+    border-radius: 0; background: transparent;
+    padding: 14px 14px 14px 0; font-family: var(--font-body); font-size: 15px;
+    color: var(--color-text); caret-color: var(--color-accent);
+    transition: border-color .15s ease;
+  }
+  .input-linea::placeholder { color: var(--color-neutral-500); }
+  .input-linea:hover { border-color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+  .input-linea:focus { border-color: var(--color-accent); outline: none; }
+  .input-linea:focus-visible { outline: none; }
+  select.input-linea { padding-left: 0; cursor: pointer; }
+
+  .etiqueta-campo {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--color-neutral-700);
+  }
+
+  /* Casilla cuadrada del prototipo ("Mantener sesión activa"). */
+  .casilla {
+    margin: 0; height: 16px; width: 16px; cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    border: 2px solid var(--color-text); background: transparent;
+  }
+  .casilla:checked { border-color: var(--color-accent); background: var(--color-accent); }
+
+  /* — avisos — filete lateral con el color semántico. `.aviso` a secas es un error
+     (rojo); `-ok` es éxito (verde), `-info` informa (azul) y `-advertencia` (ámbar). */
+  .aviso {
+    border-left: 3px solid var(--color-danger);
+    background: var(--color-danger-100);
+    padding: 12px 14px; font-size: 13px; color: var(--color-danger-800);
+  }
+  .aviso-ok {
+    border-left-color: var(--color-success);
+    background: var(--color-success-100);
+    color: var(--color-success-800);
+  }
+  .aviso-info {
+    border-left-color: var(--color-accent);
+    background: var(--color-accent-100);
+    color: var(--color-accent-800);
+  }
+  .aviso-advertencia {
+    border-left-color: var(--color-warning);
+    background: var(--color-warning-100);
+    color: var(--color-warning-800);
+  }
+  .aviso ul { margin: 0; padding-left: 18px; list-style: square; }
+
+  /* — tarjetas —
+     Dos pesos deliberados, para que la jerarquía visual sea una decisión y no un
+     accidente de qué borde se copió y pegó:
+       .card         superficie tranquila, agrupa contenido secundario o repetido
+                     (posts del muro, tarjetas de bandeja, columnas del tablero).
+                     Borde fino + sombra suave: separa sin gritar.
+       .card-strong  la caja pide acción (redactar, dar de alta, formularios cortos).
+                     Reforma 2026-08-28: ya no es un marco de 2px sólido —eran las
+                     "rayas negras" que se pidió quitar—; el énfasis ahora es sombra
+                     más presente, no una línea más gruesa. */
+  .card {
+    display: flex; flex-direction: column; gap: var(--space-2);
+    padding: var(--space-3); border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-divider);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .15s ease, border-color .15s ease;
+  }
+  .card-hover:hover { box-shadow: var(--shadow-md); border-color: color-mix(in srgb, var(--color-text) 18%, transparent); }
+  .card-strong {
+    display: flex; flex-direction: column; gap: var(--space-2);
+    padding: var(--space-3); border-radius: var(--radius-md);
+    background: var(--color-bg);
+    border: 1px solid var(--color-divider);
+    box-shadow: var(--shadow-md);
+  }
+  .card-kicker { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent); }
+  .card-title { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 17px; line-height: 1.2; }
+  .card-body { margin: 0; font-size: 13px; opacity: 0.8; flex: 1; }
+  .elev-sm { box-shadow: var(--shadow-sm); }
+  .elev-md { box-shadow: var(--shadow-md); }
+  .elev-lg { box-shadow: var(--shadow-lg); }
+
+  /* — cifras destacadas —
+     El primer valor de un grupo de métricas (saldo disponible, rol) lleva más peso;
+     el resto acompaña. Antes cada vista repetía este contraste con una mezcla
+     distinta de utilidades — ahora es un componente, no una convención tácita. */
+  .stat {
+    padding: var(--space-3); border-radius: var(--radius-md);
+    background: var(--color-surface); border: 1px solid var(--color-divider);
+    box-shadow: var(--shadow-sm);
+  }
+  .stat-highlight { background: var(--color-bg); border: 1px solid var(--color-divider); box-shadow: var(--shadow-md); }
+  .stat-value { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 28px; line-height: 1; margin: 6px 0 0; }
+
+  /* — píldoras — */
+  .tag {
+    display: inline-flex; align-items: center; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.02em; padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
+  .tag-neutral { background: var(--color-neutral-100); color: var(--color-neutral-800); }
+  .tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent-700); }
+  .tag-success { background: var(--color-success-100); color: var(--color-success-800); }
+  .tag-danger { background: var(--color-danger-100); color: var(--color-danger-800); }
+  .tag-warning { background: var(--color-warning-100); color: var(--color-warning-800); }
+
+  /* — reglas — */
+  .hr { height: 1px; border: 0; margin: var(--space-4) 0; background: var(--color-divider); }
+  .text-muted { color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+
+  /* ── Componentes que estrena el shell de la aplicación (hito 3 en adelante) ──
+     Se portan ahora, con el resto del sistema, para que las vistas nuevas no
+     tengan que reinventarlos ni volver a mirar el prototipo.
+
+     OJO al mirar `static/main.css` y no encontrarlos: Tailwind poda las clases de
+     @layer components que ninguna plantilla usa todavía. No es que el port haya
+     fallado — aparecen solas en cuanto una vista escriba class="table". */
+
+  /* — navegación — */
+  .nav {
+    display: flex; align-items: center; gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 2px solid var(--color-divider);
+  }
+  .nav-brand {
+    font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+    font-size: 18px; margin-right: auto;
+  }
+  .nav a { color: inherit; text-decoration: none; font-size: 14px; transition: color .15s ease; }
+  .nav a:hover, .nav a[aria-current='page'] { color: var(--color-accent); text-decoration: none; }
+
+  /* — tablas — */
+  .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .table th {
+    text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-text) 60%, transparent);
+    padding: var(--space-2); border-bottom: 2px solid var(--color-divider);
+  }
+  .table td { padding: var(--space-2); border-bottom: 1px solid var(--color-divider); }
+  .table tbody tr { transition: background-color .12s ease; }
+  .table tbody tr:hover { background: color-mix(in srgb, var(--color-text) 4%, transparent); }
+
+  /* — tarjeta del tablero (kanban) —
+     Separada de `.card` porque necesita estados que una tarjeta normal no pide:
+     asa de arrastre (grab/grabbing) y un hueco de acción que solo aparece al pasar
+     el mouse, para no ensuciar la tarjeta con un botón de borrar siempre visible. */
+  .tablero-columna {
+    background: var(--color-surface); border: 1px solid var(--color-divider);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+  }
+  .tablero-columna:has([data-sobre-columna]) { border-color: var(--color-accent); box-shadow: var(--shadow-md); }
+  .tablero-tarjeta {
+    background: var(--color-bg); border: 1px solid var(--color-divider);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+    cursor: grab; transition: box-shadow .15s ease, border-color .15s ease, opacity .15s ease;
+  }
+  .tablero-tarjeta:hover { box-shadow: var(--shadow-md); border-color: color-mix(in srgb, var(--color-text) 30%, transparent); }
+  .tablero-tarjeta:active { cursor: grabbing; }
+  .tablero-tarjeta.arrastrando { opacity: 0.4; }
+  .tablero-borrar {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; flex: none; border-radius: 999px;
+    border: 0; background: transparent; color: var(--color-neutral-500);
+    cursor: pointer; line-height: 1; transition: background-color .15s ease, color .15s ease;
+  }
+  .tablero-borrar:hover { background: var(--color-danger-100); color: var(--color-danger); }
+
+  /* — radios y segmentados — */
+  .radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+  .radio input, .seg-opt input {
+    position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
+  }
+  .radio .dot {
+    width: 16px; height: 16px; flex: none; border-radius: 50%;
+    border: 1.5px solid var(--color-divider);
+  }
+  .radio:hover .dot { border-color: var(--color-accent); }
+  .radio input:checked + .dot {
+    border-color: var(--color-accent); background: var(--color-accent);
+    box-shadow: inset 0 0 0 4px var(--color-bg);
+  }
+  .radio input:focus-visible + .dot { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .seg {
+    display: inline-flex; overflow: hidden;
+    border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+  }
+  .seg-opt {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 12px; font-size: 13px; cursor: pointer;
+  }
+  .seg-opt + .seg-opt { border-left: 1px solid var(--color-divider); }
+  .seg-opt:has(input:checked) { background: var(--color-accent); color: var(--color-bg); }
+  .seg-opt:not(:has(input:checked)):hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+  .seg-opt:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+
+  /* — diálogos — */
+  .dialog-backdrop {
+    position: fixed; inset: 0; display: grid; place-items: center;
+    padding: var(--space-4);
+    background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
+  }
+  .dialog {
+    width: min(440px, 100%); display: flex; flex-direction: column; gap: var(--space-3);
+    padding: var(--space-4); border-radius: var(--radius-lg);
+    background: var(--color-surface); box-shadow: var(--shadow-lg);
+  }
+  .dialog-title {
+    font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+    font-size: 20px;
+  }
+  .dialog-body { font-size: 14px; opacity: 0.85; }
+  .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+
+  /* — utilidades del sistema — */
+  .grayscale-ds { filter: grayscale(1) contrast(1.08); }
+
+  /* Fondo del panel de marca del login: rejilla fina sobre el primario claro. */
+  .panel-marca-rejilla {
+    background-color: var(--color-accent-100);
+    background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 12%, transparent) 1px, transparent 1px);
+    background-size: 25% 100%;
+  }
+
+  /* Velo detrás del menú lateral en pantallas chicas. */
+  .overlay-menu { background: color-mix(in srgb, var(--color-neutral-900) 45%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ============================================================================
+   Barras de resultado de las encuestas del muro.
+
+   FUERA de @layer components a propósito: el ancho se elige desde Thymeleaf con
+   un nombre de clase construido al vuelo (barra-0 … barra-100), y Tailwind, que
+   compila leyendo el código fuente, no puede verlo. Dentro de una capa lo podaría
+   por no encontrar ningún uso; aquí sobrevive.
+
+   Alternativas descartadas: style="width:37%" (la CSP prohíbe estilos en línea)
+   y w-[37%] (esa clase no existiría en el CSS compilado).
+   ========================================================================== */
+.barra-0 { width: 0%; }
+.barra-5 { width: 5%; }
+.barra-10 { width: 10%; }
+.barra-15 { width: 15%; }
+.barra-20 { width: 20%; }
+.barra-25 { width: 25%; }
+.barra-30 { width: 30%; }
+.barra-35 { width: 35%; }
+.barra-40 { width: 40%; }
+.barra-45 { width: 45%; }
+.barra-50 { width: 50%; }
+.barra-55 { width: 55%; }
+.barra-60 { width: 60%; }
+.barra-65 { width: 65%; }
+.barra-70 { width: 70%; }
+.barra-75 { width: 75%; }
+.barra-80 { width: 80%; }
+.barra-85 { width: 85%; }
+.barra-90 { width: 90%; }
+.barra-95 { width: 95%; }
+.barra-100 { width: 100%; }
+
+/* ============================================================================
+   Organigrama gráfico: árbol con líneas conectoras en CSS puro (§ organigrama).
+
+   Misma técnica que cualquier "pure CSS org chart": cada <ul> anidado es un
+   flexbox centrado, y cada <li> dibuja su línea vertical hacia el padre
+   (::before) y su tramo de línea horizontal hacia los hermanos (::after). Sin
+   librería de JS: la CSP no admite scripts de CDN y esto no lo necesita.
+
+   FUERA de @layer por la misma razón que las .barra-*: son clases que Tailwind
+   nunca tendría que purgar, pero como esto no son utilidades sino un componente
+   completo, es más simple declararlo aparte que pelear con @apply.
+   ========================================================================== */
+.organigrama-grafico-envoltorio {
+  overflow-x: auto;
+  padding: var(--space-4) 0;
+}
+
+.organigrama-grafico {
+  display: inline-flex;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  transform-origin: top left;
+  transition: transform 0.15s ease;
+}
+
+.organigrama-grafico ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding-top: var(--space-6);
+}
+
+.organigrama-grafico li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: var(--space-6) var(--space-3) 0 var(--space-3);
+}
+
+/* Línea vertical: del nodo hacia el tramo horizontal de sus hermanos. */
+.organigrama-grafico li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: var(--space-6);
+  border-left: 1px solid var(--color-divider);
+}
+
+/* Línea horizontal: conecta a un nodo con sus hermanos, a la altura del padre. */
+.organigrama-grafico li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--color-divider);
+}
+
+.organigrama-grafico li:first-child::after { left: 50%; }
+.organigrama-grafico li:last-child::after { right: 50%; }
+.organigrama-grafico li:only-child::after { display: none; }
+
+/* La raíz (los que no tienen jefe) no tiene de dónde colgar una línea. */
+.organigrama-grafico > li::before,
+.organigrama-grafico > li::after {
+  display: none;
+}
+
+.organigrama-nodo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-divider);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-2) var(--space-3);
+  cursor: default;
+}
+
+.organigrama-nodo[data-tiene-hijos="true"] {
+  cursor: pointer;
+}

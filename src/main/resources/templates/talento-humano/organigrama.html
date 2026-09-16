@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<!-- Organigrama (D-021): RH declara "estos cargos reportan a Fulano" (jefe_cargo, V10) y,
+     aparte, puede hacer una excepción manual persona a persona. jefe_cargo no reemplaza a
+     usuario.coordinador_id como fuente de verdad, solo lo alimenta — ver
+     OrganigramaService. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Organigrama', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Talento Humano</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Organigrama</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 max-w-[62ch] text-[15px] leading-[1.6] text-neutral-700">
+            Asigná qué cargos reportan a cada jefe. Eso sugiere quién aprueba en primera
+            instancia a cada colaborador con ese cargo; si un caso puntual necesita otro
+            jefe, usá la excepción manual más abajo.
+        </p>
+    </section>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[360px_1fr]">
+
+        <!-- ══ ASIGNAR CARGOS A UN JEFE ═══════════════════════════════════ -->
+        <section class="card-strong p-6">
+            <span class="card-kicker">Cargos a cargo de un jefe</span>
+
+            <!-- Sin JS: la CSP del proyecto no admite scripts en línea (ni onchange), así
+                 que elegir jefe siempre pasa por un submit explícito, no un auto-reload. -->
+            <form method="get" th:action="@{/talento-humano/organigrama}" class="mt-4 flex flex-col gap-2">
+                <label class="etiqueta-campo" for="jefeId">Jefe</label>
+                <select id="jefeId" name="jefeId" class="input">
+                    <option value="">— Elegí un jefe —</option>
+                    <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.nombre}"
+                            th:selected="${jefeSeleccionado != null and jefeSeleccionado == u.id}">
+                        Nombre
+                    </option>
+                </select>
+                <button type="submit" class="btn btn-secondary w-full py-2 text-[12px] uppercase tracking-[0.06em]">
+                    Ver sus cargos
+                </button>
+            </form>
+
+            <form th:if="${jefeSeleccionado != null}" method="post"
+                  th:action="@{/talento-humano/organigrama/asignar}" class="mt-5 flex flex-col gap-3">
+                <input type="hidden" name="jefeId" th:value="${jefeSeleccionado}">
+                <p class="m-0 text-[12px] text-neutral-600">
+                    Marcá todos los cargos que reportan a esta persona. Un cargo que ya
+                    colgaba de otro jefe se lo saca de ahí.
+                </p>
+                <div class="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
+                    <label th:each="c : ${cargos}" class="flex items-center gap-2 text-[14px]">
+                        <input type="checkbox" name="cargoIds" th:value="${c.id}"
+                               th:checked="${cargosSeleccionados != null and cargosSeleccionados.contains(c.id)}">
+                        <span th:text="${c.nombre}">Cargo</span>
+                    </label>
+                    <p th:if="${#lists.isEmpty(cargos)}" class="m-0 text-[13px] text-neutral-600">
+                        No hay cargos activos.
+                    </p>
+                </div>
+                <button type="submit" class="btn btn-primary w-full py-3 text-[13px] uppercase tracking-[0.06em]">
+                    Guardar
+                </button>
+            </form>
+        </section>
+
+        <!-- ══ ESTADO ACTUAL ═══════════════════════════════════════════════ -->
+        <section class="flex flex-col gap-8">
+
+            <div>
+                <h2 class="m-0 mb-4 text-[22px]">Quién manda sobre cada cargo</h2>
+
+                <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(asignaciones)}">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th class="pl-5">Cargo</th>
+                            <th class="pr-5">Jefe</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="a : ${asignaciones}">
+                            <td class="pl-5" th:text="${a.cargo.nombre}">Cargo</td>
+                            <td class="pr-5" th:text="${a.jefe.nombre}">Jefe</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p th:if="${#lists.isEmpty(asignaciones)}" class="text-[14px] text-neutral-700">
+                    Todavía no hay ningún cargo con jefe asignado.
+                </p>
+            </div>
+
+            <div th:if="${not #lists.isEmpty(cargosSinJefe)}">
+                <h2 class="m-0 mb-3 text-[16px] text-neutral-700">Cargos sin jefe asignado</h2>
+                <div class="flex flex-wrap gap-2">
+                    <span th:each="c : ${cargosSinJefe}" class="tag tag-outline uppercase tracking-[0.06em]"
+                          th:text="${c.nombre}">Cargo</span>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <!-- ══ EXCEPCIÓN MANUAL ═══════════════════════════════════════════════ -->
+    <section class="card-strong p-6">
+        <span class="card-kicker">Excepción manual</span>
+        <p class="mt-3 max-w-[70ch] text-[14px] leading-[1.6] text-neutral-700">
+            Cambia el jefe directo de una persona puntual, saltándose lo que diga su cargo.
+            Sirve para casos particulares que no ameritan tocar la regla general de arriba.
+        </p>
+
+        <form method="post" th:action="@{/talento-humano/organigrama/reasignar}"
+              class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+            <div>
+                <label class="etiqueta-campo" for="colaboradorId">Colaborador</label>
+                <select id="colaboradorId" name="colaboradorId" required class="input">
+                    <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.nombre}">Nombre</option>
+                </select>
+            </div>
+            <div>
+                <label class="etiqueta-campo" for="nuevoJefeId">Nuevo jefe</label>
+                <select id="nuevoJefeId" name="nuevoJefeId" class="input">
+                    <option value="">— Sin jefe —</option>
+                    <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.nombre}">Nombre</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary py-3 text-[13px] uppercase tracking-[0.06em]">
+                Reasignar
+            </button>
+        </form>
+
+        <div class="mt-6">
+            <h2 class="m-0 mb-3 text-[16px] text-neutral-700">Excepciones vigentes</h2>
+
+            <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(excepciones)}">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="pl-5">Colaborador</th>
+                        <th>Jefe actual</th>
+                        <th class="pr-5">Lo que sugiere su cargo</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="e : ${excepciones}">
+                        <td class="pl-5" th:text="${e.colaborador.nombre}">Colaborador</td>
+                        <td th:text="${e.colaborador.coordinador != null ? e.colaborador.coordinador.nombre : '— Sin jefe —'}">Jefe actual</td>
+                        <td class="pr-5" th:text="${e.jefeSugerido != null ? e.jefeSugerido.nombre : '— El cargo no tiene jefe sugerido —'}">Sugerido</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p th:if="${#lists.isEmpty(excepciones)}" class="text-[14px] text-neutral-700">
+                No hay ninguna excepción manual activa: el jefe directo de todos coincide
+                con lo que sugiere su cargo.
+            </p>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

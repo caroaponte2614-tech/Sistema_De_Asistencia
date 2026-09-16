@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!-- Alta de horas extra: un solo paso, va directo a la bandeja de Talento Humano. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Registrar horas extra', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Horas extra</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Registrar horas extra</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 max-w-[62ch] text-[15px] leading-[1.6] text-neutral-700">
+            Solo puedes registrar sobre quien te reporta directamente. Queda pendiente
+            hasta que Talento Humano la apruebe o la deniegue.
+        </p>
+    </section>
+
+    <form th:action="@{/coordinacion/horas-extras}" method="post" class="card-strong flex max-w-[620px] flex-col gap-6 p-6"
+          th:if="${not #lists.isEmpty(equipo)}">
+
+        <div class="flex flex-col gap-2">
+            <label for="colaboradorId" class="etiqueta-campo">Colaborador</label>
+            <select id="colaboradorId" name="colaboradorId" required class="input-linea">
+                <option th:each="c : ${equipo}" th:value="${c.id}" th:text="${c.nombre}">Colaborador</option>
+            </select>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div class="flex flex-col gap-2">
+                <label for="recargoCodigo" class="etiqueta-campo">Tipo de recargo</label>
+                <select id="recargoCodigo" name="recargoCodigo" required class="input-linea">
+                    <option th:each="t : ${tipos}" th:value="${t.codigo}" th:text="${t.nombre}">Tipo</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label for="fecha" class="etiqueta-campo">Fecha</label>
+                <input id="fecha" name="fecha" type="date" required class="input-linea"
+                       th:max="${T(java.time.LocalDate).now()}">
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <label for="horas" class="etiqueta-campo">Horas</label>
+            <input id="horas" name="horas" type="number" min="0.01" step="0.25" required class="input-linea"
+                   placeholder="2.5">
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <label for="observacion" class="etiqueta-campo">Observación</label>
+            <input id="observacion" name="observacion" type="text" maxlength="300" class="input-linea"
+                   placeholder="Opcional">
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            <button type="submit"
+                    class="btn btn-primary px-[18px] py-4 text-[14px] uppercase tracking-[0.06em]">
+                Enviar a Talento Humano
+            </button>
+            <a th:href="@{/coordinacion/horas-extras}"
+               class="btn btn-secondary px-[18px] py-4 text-[14px] uppercase tracking-[0.06em]">
+                Cancelar
+            </a>
+        </div>
+    </form>
+
+    <section th:if="${#lists.isEmpty(equipo)}">
+        <div class="border-l-[3px] border-neutral-400 bg-neutral-100 px-5 py-4 text-[14px] text-neutral-700">
+            No tienes a nadie a cargo todavía, así que no hay sobre quién registrar horas extra.
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

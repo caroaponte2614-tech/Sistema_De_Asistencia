@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!--
+  Tablero de área (D-030): compartido por todo el equipo del área, lo gestiona su líder.
+  A diferencia del tablero personal (fragments/tablero.html, que no cambia), este SÍ lo ve
+  todo el equipo del área — solo el líder (o un administrador) puede tocarlo.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Tablero de área', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section th:if="${sinArea}">
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Equipo</span>
+        <h2 class="m-0 mt-2 text-[32px] tracking-[-0.02em]">Tablero de área</h2>
+        <p class="mt-3 max-w-[65ch] text-[14px] leading-[1.6] text-neutral-700">
+            Todavía no tienes un área asignada, así que no hay un tablero de equipo que
+            mostrarte. Si crees que deberías tener uno, escríbele a Talento Humano.
+        </p>
+    </section>
+
+    <th:block th:unless="${sinArea}">
+
+        <section>
+            <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Equipo</span>
+            <h2 class="m-0 mt-2 text-[32px] tracking-[-0.02em]" th:text="${tablero.nombre}">Tablero de área</h2>
+            <p class="mt-3 max-w-[65ch] text-[14px] leading-[1.6] text-neutral-700">
+                <span th:if="${liderNombre != null}" th:text="'Líder del área: ' + ${liderNombre} + '.'">Líder</span>
+                <span th:unless="${liderNombre != null}">Esta área todavía no tiene líder asignado.</span>
+                <span th:if="${puedeEditar}"> Puedes crear, mover y eliminar tarjetas.</span>
+                <span th:unless="${puedeEditar}"> Solo el líder del área (o un administrador) puede moverlas; tú las ves.</span>
+            </p>
+        </section>
+
+        <!-- Pestañas: una por área relevante (o todas, si eres ADMIN). -->
+        <nav aria-label="Áreas" class="flex flex-wrap gap-2" th:if="${#lists.size(pestanas) > 1}">
+            <a th:each="a : ${pestanas}" th:href="@{${rutaBase} + '/' + ${a.id}}"
+               th:text="${a.nombre}"
+               th:classappend="${a.id == areaActual.id} ? 'bg-accent-200 font-semibold text-accent-800' : 'bg-surface text-neutral-700 hover:bg-neutral-200'"
+               class="rounded-full border border-divider px-4 py-2 text-[13px] no-underline transition-colors hover:no-underline">
+                Área
+            </a>
+        </nav>
+
+        <div id="aviso-conflicto" class="aviso hidden" role="alert">
+            Alguien cambió esta tarea mientras la tenías abierta. Se recargó con la versión actual.
+        </div>
+
+        <section class="card-strong p-5" th:if="${puedeEditar}">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <h3 class="m-0 text-[17px]">Nueva tarea</h3>
+                <a th:href="@{'/api/v1/tablero/area/' + ${areaActual.id} + '/reporte.xlsx'}"
+                   class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">
+                    Descargar reporte
+                </a>
+            </div>
+            <form id="form-nueva-tarjeta-area" class="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-3">
+                <div class="flex min-w-0 flex-1 flex-col gap-1">
+                    <label for="nueva-titulo-area" class="etiqueta-campo">Título</label>
+                    <input id="nueva-titulo-area" name="titulo" type="text" required maxlength="200"
+                           class="input-linea" placeholder="¿Qué hay que hacer?">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label for="nueva-etiqueta-area" class="etiqueta-campo">Etiqueta</label>
+                    <input id="nueva-etiqueta-area" name="etiqueta" type="text" maxlength="120"
+                           class="input-linea sm:w-[150px]" placeholder="Opcional">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label for="nueva-prioridad-area" class="etiqueta-campo">Prioridad</label>
+                    <select id="nueva-prioridad-area" name="prioridad" class="input-linea sm:w-[120px]">
+                        <option value="NORMAL">Normal</option>
+                        <option value="ALTA">Alta</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label for="nueva-fecha-limite-area" class="etiqueta-campo">Vence</label>
+                    <input id="nueva-fecha-limite-area" name="fechaLimite" type="datetime-local"
+                           class="input-linea sm:w-[190px]">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label for="nueva-columna-area" class="etiqueta-campo">Columna</label>
+                    <select id="nueva-columna-area" name="columnaId" class="input-linea sm:w-[170px]">
+                        <option th:each="c : ${columnas}" th:value="${c.id}" th:text="${c.nombre}">Columna</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary px-[18px] py-3 text-[13px] uppercase tracking-[0.06em]">
+                    Añadir
+                </button>
+            </form>
+        </section>
+
+        <section class="flex justify-end" th:unless="${puedeEditar}">
+            <a th:href="@{'/api/v1/tablero/area/' + ${areaActual.id} + '/reporte.xlsx'}"
+               class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">
+                Descargar reporte
+            </a>
+        </section>
+
+        <!-- ══ COLUMNAS ══════════════════════════════════════════════════════ -->
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" id="tablero-area"
+                  th:data-area-id="${areaActual.id}" th:data-puede-editar="${puedeEditar}">
+            <div th:each="c : ${columnas}" class="tablero-columna flex min-h-[200px] flex-col overflow-hidden">
+
+                <header class="flex items-baseline justify-between gap-2 border-b border-divider bg-surface px-4 py-3">
+                    <h3 class="m-0 text-[14px] uppercase tracking-[0.08em]" th:text="${c.nombre}">Columna</h3>
+                    <span class="tag tag-neutral"
+                          th:text="${tarjetasPorColumna.containsKey(c.id) ? #lists.size(tarjetasPorColumna.get(c.id)) : 0}">0</span>
+                </header>
+
+                <div class="flex flex-1 flex-col gap-3 p-3" data-columna th:data-columna-id="${c.id}">
+
+                    <article th:each="t : ${tarjetasPorColumna.containsKey(c.id) ? tarjetasPorColumna.get(c.id) : {}}"
+                             th:draggable="${puedeEditar}" data-tarjeta
+                             th:data-tarjeta-id="${t.id}"
+                             th:data-version="${t.version}"
+                             class="tablero-tarjeta p-3">
+
+                        <div class="flex items-start justify-between gap-2">
+                            <p class="m-0 text-[14px] font-semibold leading-snug" th:text="${t.titulo}">Título</p>
+                            <button th:if="${puedeEditar}" type="button" data-borrar aria-label="Eliminar tarea"
+                                    class="tablero-borrar">×</button>
+                        </div>
+
+                        <p th:if="${t.nota != null}" class="m-0 mt-1.5 text-[13px] leading-[1.5] text-neutral-700"
+                           th:text="${t.nota}">Nota</p>
+
+                        <div class="mt-2.5 flex flex-wrap items-center gap-2">
+                            <span th:if="${t.prioridad.name() == 'ALTA'}"
+                                  class="tag tag-warning uppercase tracking-[0.06em]">Alta</span>
+                            <span th:if="${t.etiqueta != null}" class="tag tag-neutral" th:text="${t.etiqueta}">Etiqueta</span>
+                            <span th:if="${t.fechaLimite != null}" class="tag uppercase tracking-[0.06em]"
+                                  th:classappend="${c.codigo != 'HECHO' and t.fechaLimite.isBefore(ahora)} ? 'tag-danger' : 'tag-outline'"
+                                  th:text="'Vence ' + ${#temporals.format(t.fechaLimite, 'dd/MM HH:mm')}">Vence</span>
+                        </div>
+
+                        <p class="m-0 mt-2 text-[11px] text-neutral-500"
+                           th:text="'Creada por ' + ${t.creadoPor.nombre} + ' el ' + ${#temporals.format(t.creadoEn, 'dd/MM/yyyy HH:mm')}">Creada</p>
+                    </article>
+
+                    <p th:if="${!tarjetasPorColumna.containsKey(c.id) or #lists.isEmpty(tarjetasPorColumna.get(c.id))}"
+                       class="m-0 py-4 text-center text-[13px] text-neutral-500" data-vacio>
+                        Sin tareas aquí
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </th:block>
+
+</th:block>
+</body>
+</html>

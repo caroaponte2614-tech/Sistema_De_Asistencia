@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!--
+  Inicio de sesión.
+  Origen del diseño: los prototipos de diseño (login/Login.dc.html) (columna derecha).
+  El formulario apunta a /login, con los nombres de campo que espera SecurityConfig
+  (email / password), heredados de un proyecto de referencia.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/auth-layout :: pagina('Ingresa a tu cuenta', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <span class="mb-3.5 text-[12px] uppercase tracking-[0.14em] text-[var(--color-accent-700)]">Inicio de sesión</span>
+    <h2 class="m-0 mb-2 text-[34px] tracking-[-0.02em]">Ingresa a tu cuenta</h2>
+    <p class="m-0 mb-8 text-[15px] text-[var(--color-neutral-700)]">Usa tu correo institucional.</p>
+
+    <div th:if="${param.error}" class="aviso mb-6" role="alert">
+        Correo o contraseña incorrectos. Intenta nuevamente.
+    </div>
+    <div th:if="${param.bloqueado}" class="aviso mb-6" role="alert">
+        Demasiados intentos fallidos. Espera unos minutos antes de volver a intentarlo.
+    </div>
+    <div th:if="${param.logout}" class="aviso aviso-ok mb-6" role="status">
+        Cerraste sesión correctamente.
+    </div>
+    <div th:if="${param.registrado}" class="aviso aviso-ok mb-6" role="status">
+        Te enviamos un correo para verificar tu cuenta. El enlace vence en 24 horas.
+    </div>
+    <div th:if="${param.verificada}" class="aviso aviso-ok mb-6" role="status">
+        Cuenta verificada. Ya puedes ingresar.
+    </div>
+    <div th:if="${param.restablecida}" class="aviso aviso-ok mb-6" role="status">
+        Tu contraseña quedó actualizada. Ingresa con la nueva.
+    </div>
+
+    <form th:action="@{/login}" method="post" class="flex flex-col gap-[22px]" data-formulario-auth>
+        <div class="flex flex-col gap-2">
+            <label for="email" class="etiqueta-campo">Correo corporativo</label>
+            <input id="email" name="email" type="email" required autofocus
+                   placeholder="nombre.apellido@schoolplus.example" autocomplete="username"
+                   th:value="${param.email}"
+                   class="input-linea">
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <div class="flex items-baseline justify-between gap-3">
+                <label for="password" class="etiqueta-campo">Contraseña</label>
+                <button type="button"
+                        class="cursor-pointer border-0 bg-transparent p-0 font-[var(--font-body)] text-[11px] uppercase tracking-[0.1em] text-[var(--color-accent-700)] hover:text-[var(--color-accent)]"
+                        data-revelar="password" aria-controls="password">Mostrar</button>
+            </div>
+            <input id="password" name="password" type="password" required
+                   placeholder="••••••••" autocomplete="current-password"
+                   class="input-linea">
+        </div>
+
+        <div class="mt-0.5 flex items-center justify-between gap-4">
+            <label class="flex cursor-pointer items-center gap-2.5 text-[13px] text-[var(--color-neutral-700)]">
+                <input type="checkbox" name="recordarme" class="casilla">
+                Mantener sesión activa
+            </label>
+            <a th:href="@{/recuperar}" class="text-[13px]">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary flex w-full items-center gap-2.5 !justify-start px-[18px] py-4 text-[14px] uppercase tracking-[0.06em]"
+                data-etiqueta-envio="Ingresando…">
+            <span class="flex-1 text-left">Ingresar</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="square" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6"></path>
+            </svg>
+        </button>
+    </form>
+
+    <p class="mt-8 text-[13px] text-[var(--color-neutral-700)]">
+        ¿Primera vez aquí? <a th:href="@{/registro}">Crea tu cuenta</a>
+    </p>
+
+</th:block>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!--
+  Pantalla de resultado de los flujos de autenticación: "revisa tu correo",
+  "el enlace venció", "la cuenta ya estaba activa". Un solo lienzo parametrizado
+  para no repetir cuatro plantillas casi idénticas.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/auth-layout :: pagina(${titulo}, ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <span class="mb-3.5 text-[12px] uppercase tracking-[0.14em] text-[var(--color-accent-700)]"
+          th:text="${antetitulo}">Aviso</span>
+    <h2 class="m-0 mb-2 text-[34px] tracking-[-0.02em]" th:text="${titulo}">Listo</h2>
+    <p class="m-0 mb-8 text-[15px] leading-[1.55] text-[var(--color-neutral-700)]" th:text="${mensaje}">Mensaje.</p>
+
+    <div th:if="${enlaceDesarrollo}" class="aviso aviso-info mb-8">
+        El envío de correo está apagado (<code>app.mail.enabled=false</code>). Enlace para
+        continuar en desarrollo:
+        <a th:href="${enlaceDesarrollo}" th:text="${enlaceDesarrollo}" class="break-all">enlace</a>
+    </div>
+
+    <a th:href="${accionUrl}"
+       class="btn btn-primary flex w-full items-center gap-2.5 !justify-start px-[18px] py-4 text-[14px] uppercase tracking-[0.06em]">
+        <span class="flex-1 text-left" th:text="${accionTexto}">Volver</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="square" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6"></path>
+        </svg>
+    </a>
+
+</th:block>
+</body>
+</html>
