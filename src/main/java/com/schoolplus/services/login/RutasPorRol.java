@@ -34,12 +34,33 @@ public final class RutasPorRol {
     public static final String RUTA_COORDINADOR = "/coordinacion";
     public static final String RUTA_USUARIO = "/mi-espacio";
 
+    /**
+     * El estudiante no tiene panel ni espacio personal: lo suyo es registrar asistencia.
+     * Llevarlo al portal sería darle la bienvenida a una pantalla en la que no puede hacer
+     * nada.
+     */
+    public static final String RUTA_ESTUDIANTE = "/estudiante/asistencia";
+
     private RutasPorRol() {
     }
 
-    /** Destino tras iniciar sesión. Igual para los cuatro roles. */
+    /** Destino tras iniciar sesión. Igual para los cuatro roles del personal. */
     public static String trasIniciarSesion() {
         return PORTAL;
+    }
+
+    /** Igual, pero mandando a los estudiantes a su pantalla de asistencia. */
+    public static String trasIniciarSesion(Collection<? extends GrantedAuthority> autoridades) {
+        return esSoloEstudiante(autoridades) ? RUTA_ESTUDIANTE : PORTAL;
+    }
+
+    /** Estudiante y nada más. Un docente que además estudie algo sigue siendo personal. */
+    public static boolean esSoloEstudiante(Collection<? extends GrantedAuthority> autoridades) {
+        return tiene(autoridades, Rol.ESTUDIANTE)
+                && !tiene(autoridades, Rol.ADMIN)
+                && !tiene(autoridades, Rol.SUPERVISOR)
+                && !tiene(autoridades, Rol.COORDINADOR)
+                && !tiene(autoridades, Rol.USUARIO);
     }
 
     public static String destinoDe(Authentication autenticacion) {
@@ -58,6 +79,9 @@ public final class RutasPorRol {
         }
         if (tiene(autoridades, Rol.COORDINADOR)) {
             return RUTA_COORDINADOR;
+        }
+        if (esSoloEstudiante(autoridades)) {
+            return RUTA_ESTUDIANTE;
         }
         return RUTA_USUARIO;
     }

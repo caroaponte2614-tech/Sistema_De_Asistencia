@@ -25,4 +25,16 @@ public final class Textos {
         String recortado = valor.trim();
         return recortado.isEmpty() ? null : recortado;
     }
+
+    /**
+     * Corta a lo que quepa en la columna. Se usa con datos que llegan de fuera y no tienen
+     * un largo garantizado —user agent, IP reenviada—: sin esto, un agente exótico de 400
+     * caracteres tumba el {@code INSERT} entero.
+     */
+    public static String recortar(String valor, int largoMaximo) {
+        if (valor == null) {
+            return null;
+        }
+        return valor.length() <= largoMaximo ? valor : valor.substring(0, largoMaximo);
+    }
 }

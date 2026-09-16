@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!--
+  Reportes de asistencia: por clase, por estudiante, por sesión y por rango de fechas, con
+  exportación a Excel y CSV. Solo cuentan las sesiones cerradas.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Reportes de asistencia', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Asistencia</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Reportes</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 max-w-[62ch] text-[15px] leading-[1.6] text-neutral-700">
+            El porcentaje es (presentes + tarde) sobre las sesiones contadas. Las faltas
+            justificadas se muestran aparte y no entran en el cálculo.
+        </p>
+    </section>
+
+    <section>
+        <form th:action="@{/docencia/asistencia/reportes}" method="get" class="card-strong"
+              th:with="filtro=${reporte != null} ? ${reporte.filtro} : null">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="field">
+                    <label for="claseId">Clase</label>
+                    <select id="claseId" name="claseId" class="input">
+                        <option value="">Todas mis clases</option>
+                        <option th:each="c : ${clases}" th:value="${c.id}" th:text="${c.etiqueta()}"
+                                th:selected="${filtro != null and filtro.claseId == c.id}">Clase</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="desde">Desde</label>
+                    <input id="desde" name="desde" type="date" class="input"
+                           th:value="${filtro != null} ? ${filtro.desde} : null">
+                </div>
+                <div class="field">
+                    <label for="hasta">Hasta</label>
+                    <input id="hasta" name="hasta" type="date" class="input"
+                           th:value="${filtro != null} ? ${filtro.hasta} : null">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="btn btn-primary w-full justify-center py-3 text-[13px] uppercase tracking-[0.06em]">
+                        Ver reporte
+                    </button>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <th:block th:if="${reporte != null}">
+
+        <section>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                <div class="stat-highlight stat text-center">
+                    <span class="card-kicker">Asistencia</span>
+                    <p class="stat-value" th:text="${reporte.total.porcentajeLegible()}">—</p>
+                </div>
+                <div class="stat text-center">
+                    <span class="card-kicker">Presentes</span>
+                    <p class="stat-value" th:text="${reporte.total.presentes}">0</p>
+                </div>
+                <div class="stat text-center">
+                    <span class="card-kicker">Tarde</span>
+                    <p class="stat-value" th:text="${reporte.total.tardes}">0</p>
+                </div>
+                <div class="stat text-center">
+                    <span class="card-kicker">Ausentes</span>
+                    <p class="stat-value" th:text="${reporte.total.ausentes}">0</p>
+                </div>
+                <div class="stat text-center">
+                    <span class="card-kicker">Justificadas</span>
+                    <p class="stat-value" th:text="${reporte.total.justificados}">0</p>
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <a class="btn btn-secondary px-5 py-3 text-[13px] uppercase tracking-[0.06em]"
+                   th:href="@{/docencia/asistencia/reportes/excel(claseId=${reporte.filtro.claseId},estudianteId=${reporte.filtro.estudianteId},desde=${reporte.filtro.desde},hasta=${reporte.filtro.hasta})}">
+                    Exportar a Excel
+                </a>
+                <a class="btn btn-secondary px-5 py-3 text-[13px] uppercase tracking-[0.06em]"
+                   th:href="@{/docencia/asistencia/reportes/csv(claseId=${reporte.filtro.claseId},estudianteId=${reporte.filtro.estudianteId},desde=${reporte.filtro.desde},hasta=${reporte.filtro.hasta})}">
+                    Exportar a CSV
+                </a>
+            </div>
+        </section>
+
+        <section th:if="${not reporte.vacio()}">
+            <h2 class="m-0 mb-4 text-[22px]">Por estudiante</h2>
+            <div class="card overflow-x-auto p-0">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="pl-5">Estudiante</th>
+                        <th>Presentes</th>
+                        <th>Tarde</th>
+                        <th>Ausentes</th>
+                        <th>Justificadas</th>
+                        <th class="pr-5">% asistencia</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${reporte.porEstudiante}">
+                        <td class="pl-5" th:text="${r.etiqueta}">Estudiante</td>
+                        <td th:text="${r.presentes}">0</td>
+                        <td th:text="${r.tardes}">0</td>
+                        <td th:text="${r.ausentes}">0</td>
+                        <td th:text="${r.justificados}">0</td>
+                        <td class="pr-5" th:text="${r.porcentajeLegible()}">—</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section th:if="${not reporte.vacio()}">
+            <h2 class="m-0 mb-4 text-[22px]">Por sesión</h2>
+            <div class="card overflow-x-auto p-0">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="pl-5">Fecha</th>
+                        <th>Hora</th>
+                        <th>Clase</th>
+                        <th>Presentes</th>
+                        <th>Tarde</th>
+                        <th>Ausentes</th>
+                        <th class="pr-5">% asistencia</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="s : ${reporte.porSesion}">
+                        <td class="pl-5" th:text="${s.fecha}">01/01/2026</td>
+                        <td th:text="${s.hora}">08:00</td>
+                        <td th:text="${s.clase}">Clase</td>
+                        <td th:text="${s.conteo.presentes}">0</td>
+                        <td th:text="${s.conteo.tardes}">0</td>
+                        <td th:text="${s.conteo.ausentes}">0</td>
+                        <td class="pr-5" th:text="${s.conteo.porcentajeLegible()}">—</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section th:if="${reporte.vacio()}">
+            <p class="text-[14px] text-neutral-700">
+                No hay sesiones cerradas en ese rango. Recuerda que una sesión cuenta cuando se
+                cierra: mientras siga abierta, todavía no tiene ausentes.
+            </p>
+        </section>
+
+    </th:block>
+
+</th:block>
+</body>
+</html>

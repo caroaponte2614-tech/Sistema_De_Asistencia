@@ -58,6 +58,13 @@
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CERTIFICADO_LABORAL_SOLICITAR')}, '/mi-espacio/certificado-laboral', 'Certificado laboral', ${seccion == 'certificado-laboral'}, ${null})}"></li>
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('RECONOCIMIENTO_CREAR') or @capacidades.puede('HORAS_EXTRA_REGISTRAR') or @capacidades.puede('PERFIL_COLABORADOR_ADMINISTRAR')}, '/coordinacion/equipo', 'Mi equipo', ${seccion == 'equipo'}, ${null})}"></li>
 
+                <!-- Asistencia. Para el estudiante son sus dos únicas pantallas; para el
+                     docente, las de sus clases. -->
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ASISTENCIA_REGISTRAR')}, '/estudiante/asistencia', 'Registrar asistencia', ${seccion == 'asistencia-estudiante'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ASISTENCIA_REGISTRAR')}, '/estudiante/asistencia/historial', 'Mi asistencia', ${seccion == 'asistencia-historial'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ASISTENCIA_TOMAR')}, '/docencia/asistencia', 'Asistencia de mis clases', ${seccion == 'asistencia-docente'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ASISTENCIA_REPORTE')}, '/docencia/asistencia/reportes', 'Reportes de asistencia', ${seccion == 'asistencia-reportes'}, ${null})}"></li>
+
                 <li class="pt-3">
                     <span class="px-3 text-[10px] uppercase tracking-[0.14em] text-neutral-600">Aprobaciones</span>
                 </li>
@@ -67,11 +74,12 @@
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('HORAS_EXTRA_APROBAR')}, '/talento-humano/horas-extras', 'Horas extra', ${seccion == 'horas-extra-bandeja'}, ${pendientesHorasExtra})}"></li>
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('HORAS_EXTRA_APROBAR')}, '/talento-humano/horas-extras/historial', 'Historial horas extra', ${seccion == 'horas-extra-historial'}, ${null})}"></li>
 
-                <li th:if="${@capacidades.puede('ORGANIGRAMA_ADMINISTRAR') or @capacidades.puede('USUARIO_ADMINISTRAR') or @capacidades.puede('CAPACITACION_ADMINISTRAR') or @capacidades.puede('TABLERO_VER')}" class="pt-3">
+                <li th:if="${@capacidades.puede('ORGANIGRAMA_ADMINISTRAR') or @capacidades.puede('USUARIO_ADMINISTRAR') or @capacidades.puede('CAPACITACION_ADMINISTRAR') or @capacidades.puede('TABLERO_VER') or @capacidades.puede('CLASE_ADMINISTRAR')}" class="pt-3">
                     <span class="px-3 text-[10px] uppercase tracking-[0.14em] text-neutral-600">Administración</span>
                 </li>
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('TABLERO_VER')}, '/admin/tablero-area', 'Tableros por área', ${seccion == 'tablero-area-admin'}, ${null})}"></li>
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('TABLERO_VER')}, '/admin/tablero-area/administrar', 'Áreas y líderes', ${seccion == 'tablero-area-administrar'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CLASE_ADMINISTRAR')}, '/talento-humano/clases', 'Clases', ${seccion == 'clases'}, ${null})}"></li>
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('USUARIO_ADMINISTRAR')}, '/talento-humano/usuarios', 'Usuarios', ${seccion == 'usuarios'}, ${null})}"></li>
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ORGANIGRAMA_ADMINISTRAR')}, '/talento-humano/organigrama', 'Editar organigrama', ${seccion == 'organigrama'}, ${null})}"></li>
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CAPACITACION_ADMINISTRAR')}, '/talento-humano/capacitaciones', 'Cursos', ${seccion == 'capacitaciones-admin'}, ${null})}"></li>
@@ -189,6 +197,8 @@
 <script th:src="@{/js/catalogo-filtrable.js}" defer></script>
 <script th:src="@{/js/organigrama.js}" defer></script>
 <script th:src="@{/js/perfil.js}" defer></script>
+<script th:src="@{/js/asistencia-proyeccion.js}" defer></script>
+<script th:src="@{/js/asistencia-estudiante.js}" defer></script>
 </body>
 
 <!-- ── Fragmentos del menú ───────────────────────────────────────────────── -->

@@ -41,6 +41,16 @@ public final class Capacidades {
     public static final String CERTIFICADO_LABORAL_SOLICITAR = "CERTIFICADO_LABORAL_SOLICITAR";
     public static final String CERTIFICADO_LABORAL_GENERAR_TERCEROS = "CERTIFICADO_LABORAL_GENERAR_TERCEROS";
 
+    // ── Asistencia (V25) ─────────────────────────────────────────────────────
+    /** Crear clases, horarios y matricular estudiantes. */
+    public static final String CLASE_ADMINISTRAR = "CLASE_ADMINISTRAR";
+    /** Abrir y cerrar sesiones, corregir registros y autorizar celulares. Ámbito PROPIO = mis clases. */
+    public static final String ASISTENCIA_TOMAR = "ASISTENCIA_TOMAR";
+    /** Registrar la propia asistencia con QR o con el código de 6 dígitos. */
+    public static final String ASISTENCIA_REGISTRAR = "ASISTENCIA_REGISTRAR";
+    /** Ver y exportar reportes de asistencia. */
+    public static final String ASISTENCIA_REPORTE = "ASISTENCIA_REPORTE";
+
     private Capacidades() {
     }
 }

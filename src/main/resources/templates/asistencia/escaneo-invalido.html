@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!--
+  Lo que ve quien escanea un QR que ya cambió o que no es de School_Plus. Es página propia y
+  no una del shell porque puede verla alguien sin sesión iniciada: el QR de asistencia es
+  público justamente para que la cámara del teléfono pueda abrirlo.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="|${titulo} · School_Plus|">School_Plus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,300;0,400;0,500;0,600;0,800;1,300&display=swap">
+    <link rel="stylesheet" th:href="@{/main.css}">
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+</head>
+<body class="m-0 grid min-h-screen place-items-center bg-[var(--color-bg)] px-6 font-[var(--font-body)] text-[var(--color-text)] antialiased">
+
+<main class="w-full max-w-[460px]">
+    <div class="flex items-baseline gap-3">
+        <div class="h-3.5 w-3.5 shrink-0 bg-[var(--color-accent)]"></div>
+        <span class="font-[var(--font-heading)] text-[15px] font-extrabold uppercase tracking-[0.16em]">School_Plus</span>
+    </div>
+
+    <div class="mt-10 rounded-[var(--radius-lg)] border-l-[3px] border-[var(--color-danger)] bg-[var(--color-danger-100)] px-6 py-6">
+        <h1 class="m-0 text-[28px] leading-[1.1] text-[var(--color-danger-800)]" th:text="${titulo}">QR no válido</h1>
+        <p class="m-0 mt-3 text-[15px] leading-[1.6] text-[var(--color-danger-800)]" th:text="${mensaje}">Mensaje</p>
+    </div>
+
+    <a th:href="@{/estudiante/asistencia}"
+       class="btn btn-primary mt-6 w-full justify-center py-4 text-[13px] uppercase tracking-[0.06em]">
+        Ir a mi asistencia
+    </a>
+</main>
+
+</body>
+</html>

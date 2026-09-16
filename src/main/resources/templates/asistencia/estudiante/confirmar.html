@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<!--
+  Remate del camino "cámara nativa del teléfono": el QR abrió /asistencia/r, el token ya se
+  comprobó y quedó guardado en la sesión. Esta pantalla solo confirma el registro (y pide la
+  ubicación si el colegio la exige), sin que el estudiante tenga que volver a hacer nada.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Confirmando asistencia', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section data-asistencia-estudiante data-confirmar th:attr="data-geo=${geoRequerida}">
+
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Asistencia</span>
+        <h1 class="m-0 mt-3 text-[32px] leading-[1.05] tracking-[-0.03em] sm:text-[40px]">Registrando…</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+
+        <p class="mt-5 max-w-[52ch] text-[15px] leading-[1.6] text-neutral-700">
+            Leímos tu código QR. Un segundo mientras lo confirmamos con tu clase.
+        </p>
+
+        <div data-resultado hidden class="mt-6 rounded-[var(--radius-lg)] p-6 text-center" role="status">
+            <p data-resultado-titulo class="m-0 font-heading text-[24px] font-extrabold leading-tight">—</p>
+            <p data-resultado-mensaje class="m-0 mt-2 text-[15px] leading-[1.5]">—</p>
+            <p data-resultado-detalle hidden class="m-0 mt-3 text-[13px] uppercase tracking-[0.08em] opacity-80">—</p>
+        </div>
+
+        <a th:href="@{/estudiante/asistencia}"
+           class="btn btn-secondary mt-6 w-full justify-center py-3 text-[13px] uppercase tracking-[0.06em]">
+            Volver a mi asistencia
+        </a>
+
+    </section>
+
+</th:block>
+</body>
+</html>

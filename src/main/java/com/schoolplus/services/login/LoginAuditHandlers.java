@@ -3,7 +3,9 @@ package com.schoolplus.services.login;
 import com.schoolplus.model.EventoAcceso;
 import com.schoolplus.repository.UsuarioRepository;
 import com.schoolplus.services.auditoria.AuditoriaAccesoService;
+import com.schoolplus.services.asistencia.EscaneoPendiente;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -34,9 +36,24 @@ public class LoginAuditHandlers {
                     .map(u -> u.getId())
                     .orElse(null);
             auditoria.registrar(EventoAcceso.LOGIN_OK, email, usuarioId, peticion, null);
-            // Al portal, no al panel del rol: es la pestaña inicial de los cuatro (§4.7).
-            respuesta.sendRedirect(peticion.getContextPath() + RutasPorRol.trasIniciarSesion());
+            respuesta.sendRedirect(peticion.getContextPath() + destinoTrasEntrar(peticion, autenticacion));
         };
+    }
+
+    /**
+     * A dónde va cada quien nada más entrar.
+     *
+     * <p>Si venía de escanear un QR de asistencia con la cámara del teléfono, el escaneo
+     * quedó guardado en su sesión: se le lleva derecho a confirmarlo. Quien no, al portal
+     * —la pestaña inicial de los cuatro roles del personal— o, si es estudiante, a su
+     * pantalla de asistencia.</p>
+     */
+    private String destinoTrasEntrar(HttpServletRequest peticion, Authentication autenticacion) {
+        HttpSession sesion = peticion.getSession(false);
+        if (sesion != null && sesion.getAttribute(EscaneoPendiente.ATRIBUTO) != null) {
+            return "/estudiante/asistencia/confirmar";
+        }
+        return RutasPorRol.trasIniciarSesion(autenticacion.getAuthorities());
     }
 
     public AuthenticationFailureHandler fallo() {

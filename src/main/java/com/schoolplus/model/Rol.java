@@ -27,6 +27,12 @@ public class Rol {
     public static final String COORDINADOR = "COORDINADOR";
     public static final String USUARIO = "USUARIO";
 
+    /**
+     * Estudiante matriculado. Es el único rol que no es "personal de la institución": no
+     * tiene solicitudes, ni tablero, ni expediente — solo su asistencia.
+     */
+    public static final String ESTUDIANTE = "ESTUDIANTE";
+
     @Id
     @Column(name = "codigo", length = 20, nullable = false)
     private String codigo;

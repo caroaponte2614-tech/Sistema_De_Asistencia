@@ -412,6 +412,36 @@
   .dialog-body { font-size: 14px; opacity: 0.85; }
   .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
 
+  /* — asistencia —
+     El resultado del registro en el celular: verde si entró, rojo si no. Son clases y no
+     utilidades sueltas porque el JavaScript alterna entre las dos. */
+  .resultado-ok {
+    background: var(--color-success-100);
+    color: var(--color-success-800);
+    border: 1px solid var(--color-success);
+  }
+  .resultado-error {
+    background: var(--color-danger-100);
+    color: var(--color-danger-800);
+    border: 1px solid var(--color-danger);
+  }
+
+  /* Modo proyección: al pasar a pantalla completa, el navegador pinta el fondo en negro
+     salvo que se le diga otra cosa. */
+  .pantalla-proyeccion:fullscreen {
+    background: var(--color-bg);
+    padding: var(--space-6);
+    overflow-y: auto;
+  }
+
+  /* El QR y el código tienen que leerse desde el fondo del salón. */
+  .cifra-proyeccion {
+    font-family: var(--font-heading);
+    font-weight: var(--font-heading-weight);
+    line-height: 1;
+    letter-spacing: 0.08em;
+  }
+
   /* — utilidades del sistema — */
   .grayscale-ds { filter: grayscale(1) contrast(1.08); }
 

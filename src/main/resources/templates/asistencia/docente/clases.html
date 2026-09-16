@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!--
+  Punto de partida del docente: sus clases, el botón para abrir la sesión y las solicitudes
+  de cambio de celular pendientes de autorizar.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Asistencia', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Docencia</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Asistencia de mis clases</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 max-w-[62ch] text-[15px] leading-[1.6] text-neutral-700">
+            Abre la sesión y proyecta el QR. Los estudiantes lo escanean con su celular y
+            aparecen en la lista al instante. Al cerrar, los que no se registraron quedan
+            ausentes y puedes corregir lo que haga falta.
+        </p>
+    </section>
+
+    <!-- Celulares por autorizar: va arriba porque bloquea a un estudiante concreto. -->
+    <section th:if="${not #lists.isEmpty(pendientesDispositivo)}">
+        <div class="card-strong border-l-[3px] border-warning">
+            <span class="card-kicker">Cambios de celular por autorizar</span>
+            <p class="m-0 text-[14px] text-neutral-700">
+                Estos estudiantes intentaron registrar asistencia desde un teléfono distinto al
+                que tenían vinculado. Autoriza solo si sabes que cambiaron de celular.
+            </p>
+            <ul class="m-0 mt-2 list-none space-y-3 p-0">
+                <li th:each="d : ${pendientesDispositivo}"
+                    class="flex flex-col gap-3 border-t border-divider pt-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="min-w-0">
+                        <p class="m-0 text-[15px]" th:text="${d.estudiante.nombre}">Estudiante</p>
+                        <p class="m-0 text-[13px] text-neutral-600">
+                            <span th:text="${d.descripcion}">Android · Chrome</span> ·
+                            <span th:text="${#temporals.format(d.solicitadoEn, 'dd/MM/yyyy HH:mm')}">fecha</span>
+                        </p>
+                    </div>
+                    <div class="flex shrink-0 gap-2">
+                        <form th:action="@{'/docencia/asistencia/dispositivos/' + ${d.id} + '/aprobar'}" method="post" class="m-0">
+                            <button type="submit" class="btn btn-primary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">
+                                Autorizar
+                            </button>
+                        </form>
+                        <form th:action="@{'/docencia/asistencia/dispositivos/' + ${d.id} + '/rechazar'}" method="post" class="m-0">
+                            <button type="submit" class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">
+                                Rechazar
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <article th:each="c : ${clases}" class="card">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <span class="card-kicker" th:text="${c.clase.asignatura}">Asignatura</span>
+                        <h2 class="m-0 mt-1 text-[20px]" th:text="${c.clase.nombre}">Clase</h2>
+                        <p class="m-0 mt-1 text-[13px] text-neutral-600">
+                            <span th:text="${c.clase.periodo}">2026-2</span> ·
+                            <span th:text="${c.inscritos}">0</span> estudiantes
+                        </p>
+                    </div>
+                    <span th:if="${c.tieneSesionAbierta()}" class="tag tag-success uppercase tracking-[0.06em]">En curso</span>
+                </div>
+
+                <ul class="m-0 list-none space-y-1 p-0 text-[13px] text-neutral-700" th:if="${not #lists.isEmpty(c.horarios)}">
+                    <li th:each="h : ${c.horarios}">
+                        <span th:text="${#temporals.format(h.horaInicio, 'HH:mm')}">08:00</span>–<span
+                            th:text="${#temporals.format(h.horaFin, 'HH:mm')}">09:00</span>
+                        <span th:text="${h.diaSemana}">MONDAY</span>
+                        <span th:if="${h.aula != null}" th:text="'· ' + ${h.aula}">· aula</span>
+                    </li>
+                </ul>
+
+                <!-- Sesión abierta: se vuelve a ella en vez de crear otra. -->
+                <a th:if="${c.tieneSesionAbierta()}"
+                   th:href="@{'/docencia/asistencia/sesiones/' + ${c.sesionAbierta.id}}"
+                   class="btn btn-primary mt-2 w-full justify-center py-3 text-[13px] uppercase tracking-[0.06em]">
+                    Volver a la proyección
+                </a>
+
+                <form th:unless="${c.tieneSesionAbierta()}"
+                      th:action="@{'/docencia/asistencia/clases/' + ${c.clase.id} + '/sesiones'}" method="post"
+                      class="mt-2 flex flex-col gap-3">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div class="field">
+                            <label th:for="'horario-' + ${c.clase.id}">Franja del horario</label>
+                            <select th:id="'horario-' + ${c.clase.id}" name="horarioId" class="input">
+                                <option value="">Sin franja (clase fuera de horario)</option>
+                                <option th:each="h : ${c.horarios}" th:value="${h.id}"
+                                        th:text="${h.diaSemana} + ' ' + ${#temporals.format(h.horaInicio, 'HH:mm')}">
+                                    Lunes 08:00
+                                </option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label th:for="'tolerancia-' + ${c.clase.id}">Tolerancia (minutos)</label>
+                            <input th:id="'tolerancia-' + ${c.clase.id}" name="tolerancia" type="number"
+                                   min="0" max="120" th:value="${toleranciaPorDefecto}" class="input">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full justify-center py-3 text-[13px] uppercase tracking-[0.06em]">
+                        Abrir sesión de asistencia
+                    </button>
+                </form>
+
+                <a th:href="@{/docencia/asistencia/reportes(claseId=${c.clase.id})}"
+                   class="text-[13px] text-accent-700 hover:underline">Ver reporte de esta clase</a>
+            </article>
+        </div>
+
+        <p th:if="${#lists.isEmpty(clases)}" class="text-[14px] text-neutral-700">
+            No tienes clases asignadas. Pídele a rectoría que te asigne como profesor de una clase.
+        </p>
+    </section>
+
+</th:block>
+</body>
+</html>

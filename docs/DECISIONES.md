@@ -147,3 +147,59 @@ acento `#0EA5E9`, neutros slate. Todo en el bloque `:root` de `styles.css`.
   acento-700 y 800 sobre el fondo suave; semánticos 800 sobre su fondo 100).
 - Los correos HTML repiten los valores en línea: los clientes de correo no leen variables.
 - No existía modo oscuro, así que no hubo que ajustarlo.
+
+## D-034 · Modelo escolar mínimo, sobre el modelo de personas que ya existía
+**Estado:** decidido (usuario: "modelo escolar").
+
+Se agregan tres tablas —`clase`, `clase_horario`, `clase_inscripcion`— y un rol nuevo,
+`ESTUDIANTE` (V25). Nada más.
+
+- **El estudiante y el docente son `usuario`.** No hay una entidad "Estudiante" aparte:
+  duplicaría identidad, autenticación, permisos y auditoría. Lo que distingue a un
+  estudiante es su rol y sus matrículas.
+- **`curso` NO se toca.** Esa tabla es el motor de capacitaciones del personal (video más
+  quiz) y seguirá siéndolo; una materia con horario y estudiantes es otra cosa y se llama
+  `clase`. Reutilizar `curso` habría mezclado dos conceptos que solo comparten el nombre.
+- **Los módulos de talento humano se quedan**, y son para los docentes: sus permisos, sus
+  vacaciones, su expediente y sus capacitaciones. El estudiante no los ve porque no tiene
+  esas capacidades, y el menú se pinta por capacidad (D-018).
+- **Retirar a alguien es `activa = false`**, nunca borrar: los registros de asistencia
+  anteriores tienen que seguir significando algo.
+
+## D-035 · Asistencia con QR dinámico: qué impide de verdad el fraude
+**Estado:** decidido.
+
+El QR lleva un token firmado (HMAC-SHA256 sobre el id de la sesión y la ventana de tiempo) y
+rota cada 15 segundos, con una ventana de gracia: vale entre 15 y 30 segundos.
+
+- **Los tokens no se guardan, se derivan.** No hay tabla que limpiar, dos instancias calculan
+  lo mismo y un token viejo no se puede revivir. El código de 6 dígitos sale del mismo HMAC,
+  con el truncamiento del RFC 4226.
+- **La rotación sola no basta**, y conviene decirlo: una foto del QR reenviada dentro de esos
+  segundos funcionaría. Lo que cierra el hueco es la **vinculación del celular** — el primer
+  registro vincula el teléfono, y otro exige aprobación de un profesor de ese estudiante.
+- **Los candados están en el esquema, no en el código** (V25): sesión abierta única por
+  clase, un registro por estudiante y sesión, un celular activo por estudiante, y un celular
+  que no registra a dos personas en la misma sesión. Dos peticiones simultáneas no se saltan
+  una restricción única; sí se saltarían un `if`.
+  - Como MariaDB 10.4 no tiene índices parciales (D-012), la restricción "solo mientras esté
+    abierta / activo" se expresa con una columna nullable con `UNIQUE` que el código llena
+    mientras la regla aplica y deja en `NULL` cuando deja de aplicar.
+- **El celular se identifica con una cookie `HttpOnly`** que pone el servidor; en la base solo
+  vive su SHA-256. Se descartó `localStorage` porque el JavaScript de la página —y cualquier
+  XSS— podría leerlo y copiarlo a otro teléfono, y porque Safari caduca a los siete días lo
+  que escribe el JavaScript.
+- **El escaneo con la cámara nativa** guarda en la sesión HTTP el token ya comprobado
+  (`EscaneoPendiente`) mientras la persona inicia sesión. El QR tuvo que estar vigente al
+  escanearlo; la espera solo cubre el login y el permiso de ubicación.
+- **La hora de referencia se congela al abrir**: con franja del horario, la tardanza se mide
+  desde que empezaba la clase, no desde que el profesor se acordó de abrir el QR.
+- **Los reportes solo cuentan sesiones cerradas**: una abierta todavía no tiene ausentes, y
+  contarla daría porcentajes que cambian solos mientras se los mira.
+- **Lector de QR:** `barcode-detector` (IIFE) servido desde el propio dominio. Usa el
+  `BarcodeDetector` nativo donde existe y, si no, un respaldo en WebAssembly que se descarga
+  solo cuando hace falta. Obligó a añadir `'wasm-unsafe-eval'` al `script-src` de la CSP, que
+  habilita WebAssembly pero no `eval()` de JavaScript.
+- **En vivo:** un WebSocket crudo por sesión que solo dice "cambió"; la pantalla vuelve a
+  pedir el estado por la misma llamada que ya usa al rotar el QR. Un solo camino para pintar
+  la lista, y si el socket no conecta, el temporizador mantiene la pantalla correcta.

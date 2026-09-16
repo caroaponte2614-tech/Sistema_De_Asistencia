@@ -6,12 +6,16 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "build": "tailwindcss -i ./styles.css -o ../resources/static/main.css --minify",
-    "watch": "tailwindcss --watch -i ./styles.css -o ../resources/static/main.css"
+    "build": "tailwindcss -i ./styles.css -o ../resources/static/main.css --minify && node scripts/copiar-vendor.js",
+    "watch": "tailwindcss --watch -i ./styles.css -o ../resources/static/main.css",
+    "vendor": "node scripts/copiar-vendor.js"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.24",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.19"
+  },
+  "dependencies": {
+    "barcode-detector": "3.2.2"
   }
 }

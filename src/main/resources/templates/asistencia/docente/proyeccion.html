@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+  Modo proyección: QR grande, código de 6 dígitos y lista en vivo.
+  Todo el contenido lo refresca asistencia-proyeccion.js — aquí solo va el primer pintado,
+  para que la pantalla no aparezca vacía mientras llega la primera respuesta.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Sesión de asistencia', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section class="pantalla-proyeccion bg-bg" data-proyeccion th:attr="data-sesion=${estado.sesionId}">
+
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="min-w-0">
+                <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Sesión abierta</span>
+                <h1 class="m-0 mt-2 text-[32px] leading-[1.05] tracking-[-0.03em]" th:text="${estado.clase}">Clase</h1>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" data-pantalla-completa
+                        class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">
+                    Pantalla completa
+                </button>
+                <form th:action="@{'/docencia/asistencia/sesiones/' + ${estado.sesionId} + '/cerrar'}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-primary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">
+                        Cerrar la sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+
+            <!-- QR + código -->
+            <div class="card-strong items-center text-center">
+                <img data-qr th:src="${estado.qr}" alt="Código QR para registrar asistencia"
+                     class="w-full max-w-[420px] rounded-[var(--radius-md)]">
+
+                <p class="m-0 mt-2 text-[12px] uppercase tracking-[0.14em] text-neutral-600">
+                    O escribe este código en la app
+                </p>
+                <p data-codigo class="cifra-proyeccion m-0 text-[56px] text-accent-800"
+                   th:text="${estado.codigo}">000000</p>
+
+                <div class="w-full max-w-[420px]">
+                    <div class="h-1.5 w-full overflow-hidden rounded-full bg-accent-100">
+                        <!-- El ancho lo mueve el JS: la política de contenido prohíbe style="" en el HTML. -->
+                        <div data-barra class="h-full bg-accent transition-[width] duration-1000 ease-linear"></div>
+                    </div>
+                    <p class="m-0 mt-2 text-[13px] text-neutral-600">
+                        Cambia en <span data-cuenta th:text="${estado.segundosParaRotar}">15</span> s
+                    </p>
+                </div>
+            </div>
+
+            <!-- Contadores y lista -->
+            <div class="flex flex-col gap-4">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="stat text-center">
+                        <span class="card-kicker">Presentes</span>
+                        <p data-presentes class="stat-value" th:text="${estado.presentes}">0</p>
+                    </div>
+                    <div class="stat text-center">
+                        <span class="card-kicker">Tarde</span>
+                        <p data-tardes class="stat-value" th:text="${estado.tardes}">0</p>
+                    </div>
+                    <div class="stat text-center">
+                        <span class="card-kicker">Del curso</span>
+                        <p data-inscritos class="stat-value text-[20px]"
+                           th:text="${estado.registrados} + ' / ' + ${estado.inscritos}">0 / 0</p>
+                    </div>
+                </div>
+
+                <div class="card max-h-[520px] overflow-y-auto">
+                    <span class="card-kicker">Van llegando</span>
+                    <ul data-lista class="m-0 list-none p-0">
+                        <li th:each="r : ${estado.registros}"
+                            class="flex items-center justify-between gap-3 border-b border-divider py-2 last:border-0">
+                            <span class="truncate text-[15px]" th:text="${r.estudiante}">Estudiante</span>
+                            <span class="tag shrink-0"
+                                  th:classappend="${r.estado == 'TARDE'} ? 'tag-warning' : 'tag-success'"
+                                  th:text="${r.hora} + ' · ' + ${r.estadoEtiqueta}">08:01 · Presente</span>
+                        </li>
+                    </ul>
+                    <p data-lista-vacia th:hidden="${not #lists.isEmpty(estado.registros)}"
+                       class="m-0 py-4 text-center text-[14px] text-neutral-600">
+                        Nadie se ha registrado todavía.
+                    </p>
+                </div>
+
+                <a th:href="@{'/docencia/asistencia/sesiones/' + ${estado.sesionId} + '/detalle'}"
+                   class="btn btn-secondary w-full justify-center py-3 text-[13px] uppercase tracking-[0.06em]">
+                    Ver la lista completa y marcar a mano
+                </a>
+            </div>
+        </div>
+
+    </section>
+
+</th:block>
+</body>
+</html>

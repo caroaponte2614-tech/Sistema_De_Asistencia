@@ -142,6 +142,78 @@ El esquema lo manda **Flyway** (`spring.jpa.hibernate.ddl-auto=validate`).
 - Una migración aplicada **no se modifica**: se corrige con una nueva.
 - Las claves primarias son UUID v7 en `CHAR(36)`.
 
+## Asistencia con QR
+
+El módulo nuevo de School_Plus. Una **clase** es una asignatura con su profesor, su horario
+y sus estudiantes matriculados (`/talento-humano/clases`).
+
+### Cómo se usa
+
+1. El profesor entra a **Asistencia de mis clases** (`/docencia/asistencia`), elige la franja
+   del horario y la tolerancia, y abre la sesión.
+2. La pantalla de proyección muestra un **QR grande**, un **código de 6 dígitos** y el
+   contador de presentes en vivo. Hay botón de pantalla completa para el proyector.
+3. Cada estudiante escanea con su celular: desde el lector de la app
+   (`/estudiante/asistencia`) o con la cámara nativa, porque el QR es un enlace. Si no tiene
+   sesión iniciada, entra y el registro se completa solo.
+4. Quien no pueda usar la cámara escribe el código de 6 dígitos.
+5. Al **cerrar la sesión**, los matriculados que no se registraron quedan **ausentes**. El
+   profesor puede corregir: justificar (con motivo obligatorio) o marcar a mano a quien no
+   tiene celular.
+
+### Antifraude
+
+| Medida | Cómo funciona |
+|---|---|
+| QR dinámico | El QR lleva un token firmado con HMAC-SHA256 (sesión + ventana de tiempo). Rota cada 15 s y se acepta una ventana de gracia: vale entre 15 y 30 segundos |
+| Código rotativo | Los 6 dígitos se derivan del mismo HMAC y cambian al mismo ritmo |
+| Solo con la sesión abierta | Un token de una sesión cerrada no registra nada |
+| Celular vinculado | El primer registro vincula el teléfono a la cuenta. Desde otro, el registro se rechaza y queda una solicitud que un profesor de ese estudiante (o un admin) debe autorizar |
+| Un celular, una persona | Restricciones únicas en la base: un celular activo por estudiante, y un mismo celular no registra a dos personas en la misma sesión |
+| Un registro por sesión | Restricción única `(sesion_id, estudiante_id)` |
+| Auditoría | Cada registro guarda método, celular, IP, user agent y, si se activa, coordenadas |
+| Ubicación (opcional) | `ASISTENCIA_GEO_HABILITADA=true` con las coordenadas del colegio y un radio en metros |
+
+El identificador del celular es una cookie aleatoria que pone el servidor (`HttpOnly`, así
+que el JavaScript de la página no puede leerla ni copiarla); en la base solo se guarda su
+SHA-256. Borrar los datos del sitio o cambiar de navegador equivale a cambiar de celular.
+
+### Reportes
+
+`/docencia/asistencia/reportes` filtra por clase, estudiante y rango de fechas, y exporta a
+**Excel** y **CSV**. Cada estudiante ve su propio historial en `/estudiante/asistencia/historial`.
+
+El porcentaje es `(presentes + tarde) / (sesiones contadas)`; una falta justificada sale del
+denominador. Solo entran sesiones **cerradas**.
+
+### Probar desde celulares reales (HTTPS)
+
+La cámara del navegador solo funciona en **contextos seguros**: `https://` o `localhost`. Para
+probar con teléfonos de verdad contra el equipo de desarrollo hace falta un túnel:
+
+```bash
+# Opción 1: cloudflared (no requiere cuenta)
+cloudflared tunnel --url http://localhost:8080
+
+# Opción 2: ngrok
+ngrok http 8080
+```
+
+El túnel da una URL `https://…`. Hay que ponerla en el `.env` y reiniciar:
+
+```bash
+APP_BASE_URL=https://mi-tunel.trycloudflare.com   # el QR apunta aquí y el WebSocket la exige como origen
+FORWARD_HEADERS_STRATEGY=framework                # para que la app vea el esquema y la IP reales
+COOKIE_SECURE=true
+```
+
+Alternativa sin túnel: un certificado local (`mkcert`) y servir la aplicación por HTTPS en la
+red local.
+
+El lector funciona en Chrome (Android) con el `BarcodeDetector` nativo y en Safari (iOS) con
+un respaldo en WebAssembly que se descarga solo cuando hace falta. Ambos archivos se sirven
+desde el propio dominio (`/vendor/...`), porque la política de contenido no admite CDN.
+
 ## Matriz de permisos
 
 Los permisos son **datos, no `if`s**: viven en `rol_capacidad` (rol × capacidad × ámbito)
@@ -161,6 +233,7 @@ pinta con el mismo bean, así que nunca muestra un enlace que daría 403.
 | `SUPERVISOR` | Rectoría / talento humano: última instancia de aprobación |
 | `COORDINADOR` | Coordinador académico o de área: primera instancia de aprobación |
 | `USUARIO` | Docente o personal de la institución |
+| `ESTUDIANTE` | Estudiante matriculado: solo registra su asistencia y ve su historial |
 
 ## Tema visual
 

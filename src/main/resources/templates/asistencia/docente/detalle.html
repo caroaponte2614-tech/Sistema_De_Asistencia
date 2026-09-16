@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!--
+  Detalle de una sesión: quién quedó cómo, la corrección por fila (justificar, cambiar
+  estado) y el marcado a mano para quien no tiene celular.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Detalle de la sesión', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section th:with="sesion=${detalle.sesion}">
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Sesión de asistencia</span>
+        <h1 class="m-0 mt-3 text-[32px] leading-[1.05] tracking-[-0.03em]" th:text="${sesion.clase.etiqueta()}">Clase</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 text-[15px] text-neutral-700">
+            <span th:text="${#temporals.format(sesion.abiertaEn, 'dd/MM/yyyy HH:mm')}">fecha</span> ·
+            puntual hasta <span th:text="${#temporals.format(sesion.limiteDePuntualidad(), 'HH:mm')}">08:10</span>
+            (<span th:text="${sesion.toleranciaMinutos}">10</span> min de tolerancia) ·
+            <span class="tag uppercase tracking-[0.06em]"
+                  th:classappend="${sesion.estaAbierta()} ? 'tag-success' : 'tag-neutral'"
+                  th:text="${sesion.estado}">ABIERTA</span>
+        </p>
+
+        <div class="mt-5 flex flex-wrap gap-2">
+            <a th:if="${sesion.estaAbierta()}" th:href="@{'/docencia/asistencia/sesiones/' + ${sesion.id}}"
+               class="btn btn-primary px-5 py-3 text-[13px] uppercase tracking-[0.06em]">Volver a la proyección</a>
+            <form th:if="${sesion.estaAbierta()}" th:action="@{'/docencia/asistencia/sesiones/' + ${sesion.id} + '/cerrar'}"
+                  method="post" class="m-0">
+                <button type="submit" class="btn btn-secondary px-5 py-3 text-[13px] uppercase tracking-[0.06em]">
+                    Cerrar la sesión
+                </button>
+            </form>
+            <a th:href="@{/docencia/asistencia/reportes(claseId=${sesion.clase.id})}"
+               class="btn btn-secondary px-5 py-3 text-[13px] uppercase tracking-[0.06em]">Reporte de la clase</a>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="m-0 mb-4 text-[22px]">Registros</h2>
+
+        <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(detalle.registros)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="pl-5">Estudiante</th>
+                    <th>Hora</th>
+                    <th>Método</th>
+                    <th>Estado</th>
+                    <th class="pr-5">Corregir</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${detalle.registros}">
+                    <td class="pl-5" th:text="${r.estudiante.nombre}">Estudiante</td>
+                    <td th:text="${#temporals.format(r.registradoEn, 'HH:mm')}">08:00</td>
+                    <td class="text-neutral-700" th:text="${r.metodo.etiqueta()}">QR</td>
+                    <td>
+                        <span class="tag uppercase tracking-[0.06em]"
+                              th:classappend="${r.estado.name() == 'PRESENTE'} ? 'tag-success'
+                                            : (${r.estado.name() == 'TARDE'} ? 'tag-warning'
+                                            : (${r.estado.name() == 'AUSENTE'} ? 'tag-danger' : 'tag-outline'))"
+                              th:text="${r.estado.etiqueta()}">Estado</span>
+                        <span th:if="${r.fueCorregido()}" class="ml-1 text-[11px] text-neutral-600">corregido</span>
+                    </td>
+                    <td class="pr-5">
+                        <form th:action="@{'/docencia/asistencia/registros/' + ${r.id}}" method="post"
+                              class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            <input type="hidden" name="sesionId" th:value="${detalle.sesion.id}">
+                            <label class="sr-only" th:for="'estado-' + ${r.id}">Estado</label>
+                            <select th:id="'estado-' + ${r.id}" name="estado" class="input sm:w-[150px]">
+                                <option th:each="e : ${estados}" th:value="${e}" th:text="${e.etiqueta()}"
+                                        th:selected="${e == r.estado}">Estado</option>
+                            </select>
+                            <label class="sr-only" th:for="'obs-' + ${r.id}">Observación</label>
+                            <input th:id="'obs-' + ${r.id}" name="observacion" type="text" maxlength="500"
+                                   th:value="${r.observacion}" placeholder="Motivo (obligatorio si justificas)"
+                                   class="input sm:w-[240px]">
+                            <button type="submit" class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">
+                                Guardar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p th:if="${#lists.isEmpty(detalle.registros)}" class="text-[14px] text-neutral-700">
+            Todavía no hay registros en esta sesión.
+        </p>
+    </section>
+
+    <!-- Quien no tiene celular: el profesor lo marca. -->
+    <section th:if="${not #lists.isEmpty(detalle.sinRegistro)}">
+        <div class="card-strong">
+            <span class="card-kicker">Sin registrar</span>
+            <p class="m-0 text-[14px] text-neutral-700">
+                Estos estudiantes están matriculados y aún no aparecen. Márcalos a mano si están
+                en clase sin celular; si cierras la sesión, quedarán ausentes.
+            </p>
+            <ul class="m-0 mt-2 list-none space-y-3 p-0">
+                <li th:each="e : ${detalle.sinRegistro}" class="border-t border-divider pt-3">
+                    <form th:action="@{'/docencia/asistencia/sesiones/' + ${detalle.sesion.id} + '/manual'}" method="post"
+                          class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <input type="hidden" name="estudianteId" th:value="${e.id}">
+                        <span class="min-w-0 truncate text-[15px]" th:text="${e.nombre}">Estudiante</span>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label class="sr-only" th:for="'manual-' + ${e.id}">Estado</label>
+                            <select th:id="'manual-' + ${e.id}" name="estado" class="input w-[150px]">
+                                <option th:each="est : ${estados}" th:value="${est}" th:text="${est.etiqueta()}">Estado</option>
+                            </select>
+                            <input name="observacion" type="text" maxlength="500" placeholder="Observación"
+                                   class="input w-[200px]">
+                            <button type="submit" class="btn btn-secondary px-4 py-2 text-[12px] uppercase tracking-[0.06em]">
+                                Marcar
+                            </button>
+                        </div>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

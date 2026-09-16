@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--
+  Pantalla del estudiante, pensada para un celular: un botón grande, la cámara, y el código
+  de 6 dígitos como salida cuando la cámara no está disponible o el permiso se negó.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Registrar asistencia', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section data-asistencia-estudiante th:attr="data-geo=${geoRequerida}">
+
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Asistencia</span>
+        <h1 class="m-0 mt-3 text-[32px] leading-[1.05] tracking-[-0.03em] sm:text-[40px]">Registra tu asistencia</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+
+        <!-- Resultado: pantalla verde si entró, roja con el motivo si no. -->
+        <div data-resultado hidden class="mt-6 rounded-[var(--radius-lg)] p-6 text-center" role="status">
+            <p data-resultado-titulo class="m-0 font-heading text-[24px] font-extrabold leading-tight">—</p>
+            <p data-resultado-mensaje class="m-0 mt-2 text-[15px] leading-[1.5]">—</p>
+            <p data-resultado-detalle hidden class="m-0 mt-3 text-[13px] uppercase tracking-[0.08em] opacity-80">—</p>
+        </div>
+
+        <!-- Botón principal: ocupa el ancho en celular, que es donde se usa. -->
+        <button type="button" data-escanear
+                class="btn btn-primary mt-7 w-full justify-center gap-3 py-5 text-[17px] uppercase tracking-[0.06em]">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                <rect x="7" y="7" width="10" height="10" rx="1"></rect>
+            </svg>
+            Escanear el QR
+        </button>
+
+        <!-- Explicación ANTES de pedir el permiso de cámara. -->
+        <div data-explicacion hidden class="card-strong mt-5">
+            <span class="card-kicker">Permiso de cámara</span>
+            <p class="m-0 text-[14px] leading-[1.6] text-neutral-700">
+                Vamos a abrir la cámara solo para leer el código QR que tu profesor tiene en
+                pantalla. No se guarda ninguna foto ni se graba video: el celular lee el
+                código y envía únicamente tu registro de asistencia.
+            </p>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" data-abrir-camara
+                        class="btn btn-primary px-5 py-3 text-[13px] uppercase tracking-[0.06em]">Abrir la cámara</button>
+                <button type="button" data-cancelar-camara
+                        class="btn btn-secondary px-5 py-3 text-[13px] uppercase tracking-[0.06em]">Ahora no</button>
+            </div>
+        </div>
+
+        <!-- Visor. `playsinline` lo pone el JS: sin él, iOS abre el video a pantalla completa. -->
+        <div data-lector hidden class="mt-5 overflow-hidden rounded-[var(--radius-lg)] border border-divider bg-neutral-900">
+            <video muted playsinline class="block aspect-square w-full object-cover"></video>
+            <p class="m-0 bg-neutral-900 px-4 py-3 text-center text-[13px] text-neutral-100">
+                Apunta al código QR de la pantalla
+            </p>
+        </div>
+
+        <!-- Salida siempre disponible: el código de 6 dígitos. -->
+        <div class="card mt-6">
+            <span class="card-kicker">¿Sin cámara?</span>
+            <p class="m-0 text-[14px] text-neutral-700">
+                Escribe los 6 dígitos que aparecen junto al QR. Cambian cada pocos segundos.
+            </p>
+            <form data-form-codigo class="mt-1 flex flex-col gap-3 sm:flex-row">
+                <label for="codigo" class="sr-only">Código de 6 dígitos</label>
+                <input id="codigo" data-codigo type="text" inputmode="numeric" pattern="[0-9]*"
+                       maxlength="7" autocomplete="one-time-code" placeholder="000 000"
+                       class="input flex-1 text-center font-heading text-[28px] tracking-[0.3em]">
+                <button type="submit"
+                        class="btn btn-primary justify-center px-6 py-4 text-[13px] uppercase tracking-[0.06em]">
+                    Registrar
+                </button>
+            </form>
+        </div>
+
+        <!-- Mis clases: para saber dónde debería estar apareciendo esto. -->
+        <div class="mt-8" th:if="${not #lists.isEmpty(clases)}">
+            <h2 class="m-0 text-[20px]">Mis clases</h2>
+            <ul class="m-0 mt-3 list-none space-y-2 p-0">
+                <li th:each="i : ${clases}" class="card flex-row items-center justify-between gap-3 py-3">
+                    <div class="min-w-0">
+                        <p class="m-0 truncate text-[15px]" th:text="${i.clase.nombre}">Clase</p>
+                        <p class="m-0 truncate text-[13px] text-neutral-600" th:text="${i.clase.profesor.nombre}">Profesor</p>
+                    </div>
+                    <span class="tag tag-neutral shrink-0" th:text="${i.clase.periodo}">2026-2</span>
+                </li>
+            </ul>
+            <a th:href="@{/estudiante/asistencia/historial}"
+               class="btn btn-secondary mt-4 w-full justify-center py-3 text-[13px] uppercase tracking-[0.06em]">
+                Ver mi historial
+            </a>
+        </div>
+
+        <p th:if="${#lists.isEmpty(clases)}" class="mt-8 text-[14px] text-neutral-700">
+            Todavía no estás matriculado en ninguna clase. Avisa en coordinación.
+        </p>
+
+    </section>
+
+</th:block>
+</body>
+</html>

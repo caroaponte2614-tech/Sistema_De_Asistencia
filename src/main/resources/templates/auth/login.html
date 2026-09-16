@@ -14,6 +14,9 @@
     <h2 class="m-0 mb-2 text-[34px] tracking-[-0.02em]">Ingresa a tu cuenta</h2>
     <p class="m-0 mb-8 text-[15px] text-[var(--color-neutral-700)]">Usa tu correo institucional.</p>
 
+    <div th:if="${asistenciaPendiente}" class="aviso aviso-info mb-6" role="status">
+        Escaneaste el QR de asistencia. Ingresa y la registramos de una vez.
+    </div>
     <div th:if="${param.error}" class="aviso mb-6" role="alert">
         Correo o contraseña incorrectos. Intenta nuevamente.
     </div>

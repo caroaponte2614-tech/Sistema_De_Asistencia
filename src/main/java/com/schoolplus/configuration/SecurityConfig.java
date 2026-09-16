@@ -85,6 +85,11 @@ public class SecurityConfig {
                 .headers(headers -> headers
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
                                 "default-src 'self'; "
+                                        // 'wasm-unsafe-eval' es lo que necesita el lector
+                                        // de QR: decodifica con WebAssembly en los
+                                        // navegadores sin BarcodeDetector nativo (Safari).
+                                        // No habilita eval() de JavaScript.
+                                        + "script-src 'self' 'wasm-unsafe-eval'; "
                                         + "img-src 'self' data:; "
                                         + "style-src 'self' https://fonts.googleapis.com; "
                                         + "font-src 'self' https://fonts.gstatic.com; "
@@ -103,12 +108,17 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/", "/login", "/registro", "/verificar",
                                 "/recuperar", "/restablecer",
-                                "/main.css", "/js/**", "/images/**", "/favicon.ico", "/favicon.svg", "/error")
+                                "/main.css", "/js/**", "/vendor/**", "/images/**",
+                                "/favicon.ico", "/favicon.svg", "/error")
                         .permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         // Verificación pública de certificados laborales: alguien escaneando
                         // el QR de un papel impreso no tiene por qué tener sesión iniciada.
                         .requestMatchers("/certificados/verificar/**").permitAll()
+                        // Destino del QR de asistencia: quien escanea con la cámara del
+                        // teléfono puede no tener sesión en ese navegador. El token se
+                        // comprueba ahí mismo y, si hace falta, se le pide entrar.
+                        .requestMatchers("/asistencia/r").permitAll()
 
                         // ── Por rol ─────────────────────────────────────────────────────
                         // ADMIN entra a todo lo de abajo también: es el rol que cubre a
@@ -124,6 +134,11 @@ public class SecurityConfig {
                         .requestMatchers("/mi-espacio/**", "/portal/**", "/portal",
                                 "/api/v1/tablero/**", "/api/v1/notificaciones/**", "/ws/**",
                                 "/sin-permiso").authenticated()
+                        // Asistencia: docentes y estudiantes. Quién entra a cada cosa lo
+                        // decide la matriz (ASISTENCIA_TOMAR / ASISTENCIA_REGISTRAR), no
+                        // el rol: un estudiante no tiene prefijo propio de rol.
+                        .requestMatchers("/docencia/**", "/estudiante/**",
+                                "/api/v1/asistencia/**").authenticated()
 
                         .anyRequest().authenticated())
 

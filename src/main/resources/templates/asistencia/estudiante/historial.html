@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!-- El historial del propio estudiante: su porcentaje por clase y el detalle sesión a sesión. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Mi asistencia', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Asistencia</span>
+        <h1 class="m-0 mt-3 text-[32px] leading-[1.05] tracking-[-0.03em] sm:text-[40px]">Mi asistencia</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 max-w-[62ch] text-[15px] leading-[1.6] text-neutral-700">
+            El porcentaje cuenta las clases ya cerradas. Llegar tarde cuenta como asistir; una
+            falta justificada no suma ni resta.
+        </p>
+    </section>
+
+    <section th:if="${not #lists.isEmpty(porClase)}">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <article th:each="resumen : ${porClase}" class="stat">
+                <span class="card-kicker" th:text="${resumen.detalle}">Profesor</span>
+                <h2 class="m-0 mt-1 text-[17px]" th:text="${resumen.etiqueta}">Clase</h2>
+                <p class="stat-value" th:text="${resumen.porcentajeLegible()}">—</p>
+                <p class="m-0 mt-2 text-[13px] text-neutral-700">
+                    <span th:text="${resumen.presentes}">0</span> presentes ·
+                    <span th:text="${resumen.tardes}">0</span> tarde ·
+                    <span th:text="${resumen.ausentes}">0</span> ausentes ·
+                    <span th:text="${resumen.justificados}">0</span> justificadas
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="m-0 mb-4 text-[22px]">Detalle</h2>
+
+        <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(registros)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="pl-5">Fecha</th>
+                    <th>Clase</th>
+                    <th>Hora</th>
+                    <th>Estado</th>
+                    <th class="pr-5">Observación</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${registros}">
+                    <td class="pl-5" th:text="${#temporals.format(r.sesion.abiertaEn, 'dd/MM/yyyy')}">01/01/2026</td>
+                    <td th:text="${r.sesion.clase.nombre}">Clase</td>
+                    <td th:text="${#temporals.format(r.registradoEn, 'HH:mm')}">08:00</td>
+                    <td>
+                        <span class="tag uppercase tracking-[0.06em]"
+                              th:classappend="${r.estado.name() == 'PRESENTE'} ? 'tag-success'
+                                            : (${r.estado.name() == 'TARDE'} ? 'tag-warning'
+                                            : (${r.estado.name() == 'AUSENTE'} ? 'tag-danger' : 'tag-outline'))"
+                              th:text="${r.estado.etiqueta()}">Estado</span>
+                    </td>
+                    <td class="pr-5 text-neutral-700" th:text="${r.observacion ?: '—'}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p th:if="${#lists.isEmpty(registros)}" class="text-[14px] text-neutral-700">
+            Todavía no tienes registros de asistencia.
+        </p>
+    </section>
+
+</th:block>
+</body>
+</html>

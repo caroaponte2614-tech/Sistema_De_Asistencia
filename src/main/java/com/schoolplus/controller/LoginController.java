@@ -3,7 +3,11 @@ package com.schoolplus.controller;
 import com.schoolplus.services.login.RutasPorRol;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import com.schoolplus.services.asistencia.EscaneoPendiente;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -20,7 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class LoginController {
 
     @GetMapping("/")
-    public String login() {
+    public String login(HttpServletRequest peticion, Model modelo) {
         Authentication autenticacion = SecurityContextHolder.getContext().getAuthentication();
         boolean autenticado = autenticacion != null
                 && autenticacion.isAuthenticated()
@@ -28,7 +32,14 @@ public class LoginController {
 
         // Quien ya entró no ve el formulario otra vez: va al portal.
         if (autenticado) {
-            return "redirect:" + RutasPorRol.trasIniciarSesion();
+            return "redirect:" + RutasPorRol.trasIniciarSesion(autenticacion.getAuthorities());
+        }
+
+        // Llegó aquí por escanear el QR de asistencia sin sesión iniciada: se le dice por
+        // qué está viendo un login en vez de su asistencia.
+        HttpSession sesion = peticion.getSession(false);
+        if (sesion != null && sesion.getAttribute(EscaneoPendiente.ATRIBUTO) != null) {
+            modelo.addAttribute("asistenciaPendiente", true);
         }
         return "auth/login";
     }

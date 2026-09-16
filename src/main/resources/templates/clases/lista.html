@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<!-- Administración de clases (rectoría / ADMIN): listado y alta. -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/app-layout :: pagina('Clases', ~{::seccion})}">
+<body>
+<th:block th:fragment="seccion">
+
+    <section>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Administración</span>
+        <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Clases</h1>
+        <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
+        <p class="mt-5 max-w-[62ch] text-[15px] leading-[1.6] text-neutral-700">
+            Una clase es una asignatura con su profesor, su horario y sus estudiantes
+            matriculados. El profesor es quien puede abrir sus sesiones de asistencia.
+        </p>
+    </section>
+
+    <section>
+        <form th:action="@{/talento-humano/clases}" method="post" class="card-strong">
+            <span class="card-kicker">Nueva clase</span>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="field">
+                    <label for="nombre">Nombre</label>
+                    <input id="nombre" name="nombre" type="text" required maxlength="150"
+                           placeholder="Matemáticas 7A" class="input">
+                </div>
+                <div class="field">
+                    <label for="asignatura">Asignatura</label>
+                    <input id="asignatura" name="asignatura" type="text" required maxlength="120"
+                           placeholder="Matemáticas" class="input">
+                </div>
+                <div class="field">
+                    <label for="grupo">Grupo</label>
+                    <input id="grupo" name="grupo" type="text" maxlength="40" placeholder="7A" class="input">
+                </div>
+                <div class="field">
+                    <label for="periodo">Periodo</label>
+                    <input id="periodo" name="periodo" type="text" required maxlength="20"
+                           placeholder="2026-2" class="input">
+                </div>
+                <div class="field sm:col-span-2">
+                    <label for="profesorId">Profesor</label>
+                    <select id="profesorId" name="profesorId" required class="input">
+                        <option value="">Elige un docente…</option>
+                        <option th:each="d : ${docentes}" th:value="${d.id}"
+                                th:text="${d.nombre} + ' · ' + ${d.email}">Docente</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2 self-start px-6 py-3 text-[13px] uppercase tracking-[0.06em]">
+                Crear clase
+            </button>
+        </form>
+    </section>
+
+    <section>
+        <div class="card overflow-x-auto p-0" th:if="${not #lists.isEmpty(clases)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="pl-5">Clase</th>
+                    <th>Asignatura</th>
+                    <th>Periodo</th>
+                    <th>Profesor</th>
+                    <th>Estudiantes</th>
+                    <th class="pr-5">Estado</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${clases}">
+                    <td class="pl-5">
+                        <a th:href="@{'/talento-humano/clases/' + ${c.id}}" th:text="${c.nombre}"
+                           class="text-accent-700 hover:underline">Clase</a>
+                    </td>
+                    <td th:text="${c.asignatura}">Asignatura</td>
+                    <td th:text="${c.periodo}">2026-2</td>
+                    <td th:text="${c.profesor.nombre}">Profesor</td>
+                    <td th:text="${inscritosPorClase.get(c.id)}">0</td>
+                    <td class="pr-5">
+                        <span class="tag uppercase tracking-[0.06em]"
+                              th:classappend="${c.activa} ? 'tag-success' : 'tag-outline'"
+                              th:text="${c.activa} ? 'Activa' : 'Inactiva'">Activa</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p th:if="${#lists.isEmpty(clases)}" class="text-[14px] text-neutral-700">
+            Todavía no hay clases creadas.
+        </p>
+    </section>
+
+</th:block>
+</body>
+</html>

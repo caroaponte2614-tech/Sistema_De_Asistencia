@@ -44,7 +44,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
         ReconocimientoController.class,
         EquipoController.class,
         PerfilColaboradorController.class,
-        CertificadoLaboralController.class
+        CertificadoLaboralController.class,
+        AsistenciaDocenteController.class,
+        AsistenciaEstudianteController.class,
+        ClaseAdminController.class
 })
 public class BandejasAdvice {
 
