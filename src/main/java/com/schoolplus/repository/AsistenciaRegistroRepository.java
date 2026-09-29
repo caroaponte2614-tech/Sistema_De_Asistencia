@@ -39,11 +39,15 @@ public interface AsistenciaRegistroRepository extends JpaRepository<AsistenciaRe
             """)
     Optional<AsistenciaRegistro> buscarCompleto(@Param("id") String id);
 
-    /** El historial que cada estudiante ve desde su celular. */
+    /**
+     * El historial que cada estudiante ve desde su celular. Trae también al profesor: el
+     * resumen por clase muestra su nombre, y se arma fuera de la transacción.
+     */
     @Query("""
             select r from AsistenciaRegistro r
             join fetch r.sesion s
             join fetch s.clase c
+            join fetch c.profesor
             where r.estudiante.id = :estudianteId
             order by s.abiertaEn desc
             """)
