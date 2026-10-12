@@ -28,8 +28,8 @@ import java.util.List;
  * Alta y mantenimiento de clases: datos, horario y matrícula.
  *
  * <p>Lo administra quien tenga {@code CLASE_ADMINISTRAR} (rectoría y ADMIN). El profesor de
- * la clase no la crea ni matricula: él toma asistencia. Esa separación es la misma que ya
- * existe entre talento humano y los colaboradores en el resto del sistema.</p>
+ * la clase no la crea ni matricula: él toma asistencia. Administrar y
+ * dictar son responsabilidades separadas.</p>
  */
 @Service
 public class ClaseService {

@@ -2,11 +2,7 @@
 <!--
   Panel de aterrizaje por rol.
 
-  Ya no es la primera pantalla tras el login —eso es el portal (§4.7)—, sino el "Panel"
-  del menú lateral. Y ya no trae su propio marco: usa el shell común, que es lo que le
-  faltaba para tener sidebar y no quedar aislada del resto de la aplicación.
-
-  Lo que pinta sigue saliendo de la tabla rol_capacidad, no de código: si Talento Humano
+  Lo que pinta sigue saliendo de la tabla rol_capacidad, no de código: si se
   habilita una fila, aparece aquí sin recompilar.
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
@@ -23,7 +19,7 @@
            th:text="${panel.descripcion}">Descripción del rol.</p>
     </section>
 
-    <section class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <section class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <div class="stat stat-highlight">
             <span class="card-kicker">Rol</span>
             <p class="mt-2 mb-0 font-heading text-[17px]" th:text="${panel.rol}">Rol</p>
@@ -33,12 +29,8 @@
             <p class="mt-2 mb-0 break-all font-heading text-[15px]" th:text="${usuario.email}">correo</p>
         </div>
         <div class="stat">
-            <span class="card-kicker">Sede</span>
-            <p class="mt-2 mb-0 font-heading text-[17px]" th:text="${usuario.sede}">Sede</p>
-        </div>
-        <div class="stat">
-            <span class="card-kicker">Cargo</span>
-            <p class="mt-2 mb-0 font-heading text-[17px]" th:text="${usuario.cargo}">Cargo</p>
+            <span class="card-kicker">Roles</span>
+            <p class="mt-2 mb-0 font-heading text-[17px]" th:text="${usuario.roles}">Roles</p>
         </div>
     </section>
 
@@ -61,15 +53,7 @@
         </ul>
 
         <p th:if="${#lists.isEmpty(capacidades)}" class="mt-4 text-[14px] text-neutral-700">
-            Tu usuario no tiene capacidades habilitadas todavía. Escribe a Talento Humano.
-        </p>
-    </section>
-
-    <section class="border-l-[3px] border-neutral-400 bg-neutral-100 px-5 py-4">
-        <h3 class="m-0 mb-2 text-[16px] uppercase tracking-[0.08em]">Próximamente</h3>
-        <p class="m-0 text-[14px] leading-[1.6] text-neutral-700">
-            Mi ficha y documentos · Horas extras · Reportes en Excel. Portal, tablero,
-            permisos y vacaciones ya funcionan; el resto llega en los hitos 5, 8 y 9.
+            Tu usuario no tiene capacidades habilitadas todavía. Escribe a la administración.
         </p>
     </section>
 

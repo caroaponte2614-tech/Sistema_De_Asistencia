@@ -127,12 +127,7 @@
             <artifactId>poi-ooxml</artifactId>
         </dependency>
 
-        <!-- ── Certificado laboral: PDF y código QR de verificación ─────── -->
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>3.0.8</version>
-        </dependency>
+        <!-- ── Código QR de la asistencia ───────────────────────────────── -->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>

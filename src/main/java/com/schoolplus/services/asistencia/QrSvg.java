@@ -16,8 +16,7 @@ import java.util.Map;
  *
  * <p>Se dibuja como SVG y no como PNG por dos motivos: en un proyector el vector no se ve
  * pixelado por grande que se ponga, y así basta con {@code zxing:core} —el módulo
- * {@code javase}, que trae el conversor a imagen, no hace falta— igual que ya hace el PDF
- * del certificado laboral.</p>
+ * {@code javase}, que trae el conversor a imagen, no hace falta.</p>
  *
  * <p>Sale como {@code data:} URI porque la política de contenido del sitio permite
  * {@code img-src 'self' data:}, y así la imagen no necesita otra petición al servidor

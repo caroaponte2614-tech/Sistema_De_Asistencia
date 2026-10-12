@@ -21,7 +21,7 @@ import java.util.List;
  * Crea la primera cuenta ADMIN al arrancar, si todavía no hay ninguna.
  *
  * <p>Sin esto, una instalación limpia no tiene por dónde entrar: el auto-registro solo
- * produce colaboradores, y ascender a alguien exige un ADMIN que ya exista.</p>
+ * produce docentes, y ascender a alguien exige un ADMIN que ya exista.</p>
  *
  * <p>Reglas: la contraseña <strong>nunca</strong> va en el código ni en el
  * {@code .properties}; llega por variable de entorno. Si no está definida, no se crea nada
@@ -88,9 +88,9 @@ public class BootstrapUsuarios implements ApplicationRunner {
                 + "misma contraseña del ADMIN. NO usar esta opción en producción.");
         String dominio = adminEmail.substring(adminEmail.indexOf('@'));
         List.of(
-                new String[]{"Supervisor de prueba", "supervisor" + dominio, Rol.SUPERVISOR},
+                new String[]{"Rectoría de prueba", "supervisor" + dominio, Rol.SUPERVISOR},
                 new String[]{"Coordinador de prueba", "coordinador" + dominio, Rol.COORDINADOR},
-                new String[]{"Colaborador de prueba", "colaborador" + dominio, Rol.USUARIO}
+                new String[]{"Docente de prueba", "docente" + dominio, Rol.USUARIO}
         ).forEach(datos -> {
             if (!usuarioRepository.existsByEmail(datos[1])) {
                 crear(datos[0], datos[1], adminPassword, datos[2]);

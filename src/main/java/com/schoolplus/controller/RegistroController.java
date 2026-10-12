@@ -2,8 +2,6 @@ package com.schoolplus.controller;
 
 import com.schoolplus.dto.RegistroForm;
 import com.schoolplus.model.EventoAcceso;
-import com.schoolplus.repository.CargoRepository;
-import com.schoolplus.repository.SedeRepository;
 import com.schoolplus.services.auditoria.AuditoriaAccesoService;
 import com.schoolplus.services.auth.RegisterService;
 import com.schoolplus.services.auth.ResultadoRegistro;
@@ -28,19 +26,13 @@ public class RegistroController {
 
     private final RegisterService registerService;
     private final ValidationService validationService;
-    private final SedeRepository sedeRepository;
-    private final CargoRepository cargoRepository;
     private final AuditoriaAccesoService auditoria;
 
     public RegistroController(RegisterService registerService,
                               ValidationService validationService,
-                              SedeRepository sedeRepository,
-                              CargoRepository cargoRepository,
                               AuditoriaAccesoService auditoria) {
         this.registerService = registerService;
         this.validationService = validationService;
-        this.sedeRepository = sedeRepository;
-        this.cargoRepository = cargoRepository;
         this.auditoria = auditoria;
     }
 
@@ -101,8 +93,6 @@ public class RegistroController {
     }
 
     private void cargarCatalogos(Model modelo) {
-        modelo.addAttribute("sedes", sedeRepository.findByActivoTrueOrderByNombreAsc());
-        modelo.addAttribute("cargos", cargoRepository.findByActivoTrueOrderByNombreAsc());
         modelo.addAttribute("longitudMinimaPassword", validationService.getLongitudMinima());
     }
 }

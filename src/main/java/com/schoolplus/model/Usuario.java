@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.Getter;
@@ -59,40 +58,11 @@ public class Usuario {
     @Column(name = "telefono", length = 20)
     private String telefono;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cargo_id")
-    private Cargo cargo;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sede_id")
-    private Sede sede;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "area_id")
-    private Area area;
-
-    /**
-     * Jefe directo. Es la relación que decide quién aprueba en primera instancia: el
-     * coordinador del solicitante, no cualquier coordinador (§4.4).
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coordinador_id")
-    private Usuario coordinador;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", length = 20, nullable = false)
     private EstadoUsuario estado = EstadoUsuario.ACTIVO;
 
-    @Column(name = "fecha_ingreso")
-    private LocalDate fechaIngreso;
-
-    /**
-     * La necesita el muro para los cumpleaños (§4.7). No existía en ninguno de los
-     * tres sistemas de origen; la añade la migración V8.
-     *
-     * <p>La columna generada {@code cumpleanos_mmdd} que la acompaña NO se mapea: la
-     * calcula el motor y solo existe para poder indexar "quién cumple hoy".</p>
-     */
+    /** Opcional. */
     @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
@@ -120,11 +90,6 @@ public class Usuario {
 
     public boolean estaActivo() {
         return estado == EstadoUsuario.ACTIVO;
-    }
-
-    /** Define el grupo de pares de "Mi tablero" (§ suite de tableros de administración). */
-    public boolean esAdmin() {
-        return roles.stream().anyMatch(r -> Rol.ADMIN.equals(r.getCodigo()));
     }
 
     /** Un usuario migrado sin hash utilizable no puede autenticarse con contraseña. */

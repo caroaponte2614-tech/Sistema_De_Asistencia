@@ -28,9 +28,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * <p>Lee el SQL en vez de la base de datos a propósito: es un test unitario y tiene que
  * correr sin MySQL delante. El catálogo nació completo en V1, pero nada impide que una
- * migración posterior agregue una fila nueva a {@code capacidad} —como V11 con
- * {@code ORGANIGRAMA_ADMINISTRAR}—, así que se recorren todas las migraciones, no solo
- * la primera.</p>
+ * migración posterior agregue filas a {@code capacidad} —como V25 con las de asistencia—
+ * o las quite —como V26—, así que se recorren todas las migraciones, no solo la
+ * primera.</p>
  */
 class CapacidadesTest {
 
@@ -64,8 +64,7 @@ class CapacidadesTest {
     void losAmbitosVanDeMenorAMayorAlcance() {
         // CapacidadService se apoya en el orden del enum para quedarse con el alcance
         // mayor cuando dos roles conceden la misma capacidad.
-        assertThat(Ambito.PROPIO.compareTo(Ambito.AREA)).isNegative();
-        assertThat(Ambito.AREA.compareTo(Ambito.TODOS)).isNegative();
+        assertThat(Ambito.PROPIO.compareTo(Ambito.TODOS)).isNegative();
     }
 
     private List<String> constantesDeclaradas() {
@@ -108,6 +107,19 @@ class CapacidadesTest {
                         codigos.add(m.group(1));
                     }
                     desde = sql.indexOf(';', inicio) + 1;
+                }
+
+                // V26 retiró los módulos laborales con un "DELETE ... WHERE codigo NOT IN
+                // (...)": lo que sobrevive es solo lo que esa lista nombra.
+                Matcher borrado = Pattern.compile(
+                        "DELETE FROM capacidad\\s+WHERE codigo NOT IN \\(([^)]*)\\)").matcher(sql);
+                while (borrado.find()) {
+                    Set<String> conservados = new java.util.HashSet<>();
+                    Matcher m = Pattern.compile("'([A-Z_]+)'").matcher(borrado.group(1));
+                    while (m.find()) {
+                        conservados.add(m.group(1));
+                    }
+                    codigos.retainAll(conservados);
                 }
             }
         }

@@ -203,3 +203,24 @@ rota cada 15 segundos, con una ventana de gracia: vale entre 15 y 30 segundos.
 - **En vivo:** un WebSocket crudo por sesión que solo dice "cambió"; la pantalla vuelve a
   pedir el estado por la misma llamada que ya usa al rotar el QR. Un solo camino para pintar
   la lista, y si el socket no conecta, el temporizador mantiene la pantalla correcta.
+
+## D-036 · School_Plus queda solo con lo académico
+**Estado:** decidido por el usuario (2026-10-12).
+
+Se retiran todos los módulos laborales (talento humano): solicitudes y vacaciones, horas
+extra, documentos de expediente, documentos institucionales, capacitaciones, organigrama y
+jerarquía, tableros, muro, reconocimientos, perfil del colaborador y certificados laborales.
+Quedan identidad y seguridad, cuenta, administración de usuarios, notificaciones, clases y
+asistencia.
+
+- **V26 deshace el esquema laboral** en vez de editar las migraciones viejas (D-005): borra
+  sus tablas, las columnas organizacionales de `usuario` (cargo, sede, área, jefe directo,
+  fecha de ingreso, cumpleaños) y las capacidades que ya no tienen pantalla.
+- **El ámbito `AREA` desaparece**: dependía del jefe directo, y ninguna capacidad que queda
+  lo usaba.
+- **`/talento-humano/**` pasa a `/rectoria/**`**, el prefijo del rol SUPERVISOR (rectoría),
+  que sigue administrando clases y usuarios.
+- **Sin portal**: cada rol aterriza en su panel tras el login, y el estudiante en su
+  pantalla de asistencia.
+- Quedan sin efecto D-013, D-015, D-016, D-017 (documentos), D-019, D-020 (el 409 de
+  los tableros), D-021, D-023, D-025 (muro), D-030 y D-032.

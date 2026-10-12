@@ -20,8 +20,7 @@ import java.util.List;
  * ignoran. A las {@code app.asistencia.duracion-maxima-horas} horas, el sistema la cierra
  * igual que lo habría hecho el profesor: los que faltaron quedan AUSENTE.</p>
  *
- * <p>Mismo patrón que el recordatorio del tablero: un {@code @Scheduled} con el cron en
- * configuración.</p>
+ * <p>Un {@code @Scheduled} con el cron en configuración.</p>
  */
 @Component
 public class CierreAutomaticoJob {

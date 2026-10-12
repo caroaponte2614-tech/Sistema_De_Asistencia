@@ -20,7 +20,7 @@
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
             <!-- Datos -->
-            <form th:action="@{'/talento-humano/clases/' + ${clase.id}}" method="post" class="card-strong">
+            <form th:action="@{'/rectoria/clases/' + ${clase.id}}" method="post" class="card-strong">
                 <span class="card-kicker">Datos</span>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div class="field">
@@ -69,7 +69,7 @@
                                 th:text="${#temporals.format(h.horaFin, 'HH:mm')}">09:00</span>
                             <span th:if="${h.aula != null}" class="text-neutral-600" th:text="'· ' + ${h.aula}">· aula</span>
                         </span>
-                        <form th:action="@{'/talento-humano/clases/' + ${clase.id} + '/horarios/' + ${h.id} + '/eliminar'}"
+                        <form th:action="@{'/rectoria/clases/' + ${clase.id} + '/horarios/' + ${h.id} + '/eliminar'}"
                               method="post" class="m-0">
                             <button type="submit" class="btn btn-secondary px-3 py-1 text-[11px] uppercase tracking-[0.06em]">
                                 Quitar
@@ -82,7 +82,7 @@
                     el momento en que el profesor abra la sesión.
                 </p>
 
-                <form th:action="@{'/talento-humano/clases/' + ${clase.id} + '/horarios'}" method="post"
+                <form th:action="@{'/rectoria/clases/' + ${clase.id} + '/horarios'}" method="post"
                       class="mt-2 grid grid-cols-2 gap-3 border-t border-divider pt-4 sm:grid-cols-4">
                     <div class="field">
                         <label for="dia">Día</label>
@@ -117,7 +117,7 @@
             <span class="card-kicker">Matrícula</span>
 
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <form th:action="@{'/talento-humano/clases/' + ${clase.id} + '/inscripciones'}" method="post"
+                <form th:action="@{'/rectoria/clases/' + ${clase.id} + '/inscripciones'}" method="post"
                       class="flex flex-col gap-3">
                     <div class="field">
                         <label for="estudianteId">Agregar un estudiante</label>
@@ -132,7 +132,7 @@
                     </button>
                 </form>
 
-                <form th:action="@{'/talento-humano/clases/' + ${clase.id} + '/inscripciones'}" method="post"
+                <form th:action="@{'/rectoria/clases/' + ${clase.id} + '/inscripciones'}" method="post"
                       class="flex flex-col gap-3">
                     <div class="field">
                         <label for="correos">O pegar una lista de correos</label>
@@ -161,7 +161,7 @@
                         <td class="text-neutral-700" th:text="${i.estudiante.email}">correo</td>
                         <td th:text="${#temporals.format(i.inscritoEn, 'dd/MM/yyyy')}">01/01/2026</td>
                         <td>
-                            <form th:action="@{'/talento-humano/clases/' + ${clase.id} + '/inscripciones/' + ${i.estudiante.id} + '/retirar'}"
+                            <form th:action="@{'/rectoria/clases/' + ${clase.id} + '/inscripciones/' + ${i.estudiante.id} + '/retirar'}"
                                   method="post" class="m-0">
                                 <button type="submit" class="btn btn-secondary px-3 py-1 text-[11px] uppercase tracking-[0.06em]">
                                     Retirar
@@ -180,7 +180,7 @@
     </section>
 
     <section>
-        <form th:action="@{'/talento-humano/clases/' + ${clase.id} + '/estado'}" method="post" class="m-0">
+        <form th:action="@{'/rectoria/clases/' + ${clase.id} + '/estado'}" method="post" class="m-0">
             <input type="hidden" name="activa" th:value="${!clase.activa}">
             <button type="submit" class="btn btn-secondary px-5 py-3 text-[13px] uppercase tracking-[0.06em]"
                     th:text="${clase.activa} ? 'Desactivar la clase' : 'Activar la clase'">Desactivar</button>

@@ -3,14 +3,13 @@
   Shell de la aplicación: sidebar fijo de 240 px + topbar + contenido.
 
   ESTRUCTURA tomada de los prototipos de diseño (vistas_tailwind/filesFrn/portal-inicial.html) —
-  el sidebar, sus ítems, la topbar pegajosa y la rejilla de dos columnas del muro.
+  el sidebar, sus ítems y la topbar pegajosa.
   PIEL en Modernist (D-009), no los tokens índigo del prototipo: la aplicación no cambia
   de aspecto al pasar el login.
 
   El menú se pinta según CAPACIDADES, no según rol: se pregunta al mismo bean
   `capacidades` que usan los @PreAuthorize, así que nunca aparece un enlace que al
-  pulsarlo daría 403. Los apartados que aún no existen se listan apagados, para que se
-  vea el mapa completo sin fingir que funcionan.
+  pulsarlo daría 403.
 -->
 <html th:fragment="pagina(titulo, contenido)" lang="es" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
@@ -33,7 +32,7 @@
     <aside id="sidebar"
            class="fixed inset-y-0 left-0 z-50 flex w-60 -translate-x-full flex-col border-r border-divider bg-surface shadow-lg transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:shadow-sm">
 
-        <a th:href="@{/portal}"
+        <a th:href="@{${rutaPanel ?: '/mi-espacio'}}"
            class="flex h-16 shrink-0 items-center gap-3 border-b border-divider px-5 no-underline hover:no-underline">
             <span class="h-3.5 w-3.5 shrink-0 bg-accent"></span>
             <span class="font-heading text-[15px] font-extrabold uppercase tracking-[0.16em] text-ink">School_Plus</span>
@@ -42,21 +41,7 @@
         <nav aria-label="Navegación principal" class="flex-1 overflow-y-auto p-3">
             <ul class="m-0 list-none space-y-1 p-0 text-[14px]">
 
-                <!-- El portal va primero: es la pestaña inicial de los cuatro roles. -->
-                <li th:replace="~{fragments/app-layout :: item(true, '/portal', 'Portal', ${seccion == 'portal'}, ${null})}"></li>
                 <li th:replace="~{fragments/app-layout :: item(true, ${rutaPanel ?: '/mi-espacio'}, 'Panel', ${seccion == 'panel'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('SOLICITUD_CREAR')}, '/mi-espacio/solicitudes', 'Solicitudes', ${seccion == 'solicitudes'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('TABLERO_USAR')}, '/mi-espacio/tablero', 'Mi tablero', ${seccion == 'tablero'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('TABLERO_USAR')}, '/mi-espacio/tablero-area', 'Tablero de mi área', ${seccion == 'tablero-area'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('DOCUMENTO_PUBLICO_SUBIR')}, '/mi-espacio/documentos', 'Mis documentos', ${seccion == 'documentos'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ORGANIGRAMA_VER')}, '/mi-espacio/organigrama', 'Jerarquía', ${seccion == 'jerarquia'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('HORAS_EXTRA_VER')}, '/mi-espacio/horas-extras', 'Mis horas extra', ${seccion == 'horas-extra-mias'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CAPACITACION_VER')}, '/mi-espacio/capacitaciones', 'Capacitaciones', ${seccion == 'capacitaciones'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('DOCUMENTO_INSTITUCIONAL_VER')}, '/mi-espacio/documentos-institucionales', 'Documentos institucionales', ${seccion == 'documentos-institucionales'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('RECONOCIMIENTO_VER')}, '/mi-espacio/reconocimientos', 'Mis reconocimientos', ${seccion == 'reconocimientos'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('PERFIL_COLABORADOR_VER')}, '/mi-espacio/perfil', 'Mi identificación', ${seccion == 'perfil'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CERTIFICADO_LABORAL_SOLICITAR')}, '/mi-espacio/certificado-laboral', 'Certificado laboral', ${seccion == 'certificado-laboral'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('RECONOCIMIENTO_CREAR') or @capacidades.puede('HORAS_EXTRA_REGISTRAR') or @capacidades.puede('PERFIL_COLABORADOR_ADMINISTRAR')}, '/coordinacion/equipo', 'Mi equipo', ${seccion == 'equipo'}, ${null})}"></li>
 
                 <!-- Asistencia. Para el estudiante son sus dos únicas pantallas; para el
                      docente, las de sus clases. -->
@@ -65,31 +50,11 @@
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ASISTENCIA_TOMAR')}, '/docencia/asistencia', 'Asistencia de mis clases', ${seccion == 'asistencia-docente'}, ${null})}"></li>
                 <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ASISTENCIA_REPORTE')}, '/docencia/asistencia/reportes', 'Reportes de asistencia', ${seccion == 'asistencia-reportes'}, ${null})}"></li>
 
-                <li class="pt-3">
-                    <span class="px-3 text-[10px] uppercase tracking-[0.14em] text-neutral-600">Aprobaciones</span>
-                </li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('SOLICITUD_APROBAR_PRIMERA')}, '/coordinacion/bandeja', 'Coordinación', ${seccion == 'bandeja-coord'}, ${pendientesCoordinacion})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('SOLICITUD_APROBAR_SEGUNDA')}, '/talento-humano/bandeja', 'Talento Humano', ${seccion == 'bandeja-rrhh'}, ${pendientesRrhh})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('HORAS_EXTRA_REGISTRAR')}, '/coordinacion/horas-extras', 'Horas extra del equipo', ${seccion == 'horas-extra-coordinacion'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('HORAS_EXTRA_APROBAR')}, '/talento-humano/horas-extras', 'Horas extra', ${seccion == 'horas-extra-bandeja'}, ${pendientesHorasExtra})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('HORAS_EXTRA_APROBAR')}, '/talento-humano/horas-extras/historial', 'Historial horas extra', ${seccion == 'horas-extra-historial'}, ${null})}"></li>
-
-                <li th:if="${@capacidades.puede('ORGANIGRAMA_ADMINISTRAR') or @capacidades.puede('USUARIO_ADMINISTRAR') or @capacidades.puede('CAPACITACION_ADMINISTRAR') or @capacidades.puede('TABLERO_VER') or @capacidades.puede('CLASE_ADMINISTRAR')}" class="pt-3">
+                <li th:if="${@capacidades.puede('USUARIO_ADMINISTRAR') or @capacidades.puede('CLASE_ADMINISTRAR')}" class="pt-3">
                     <span class="px-3 text-[10px] uppercase tracking-[0.14em] text-neutral-600">Administración</span>
                 </li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('TABLERO_VER')}, '/admin/tablero-area', 'Tableros por área', ${seccion == 'tablero-area-admin'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('TABLERO_VER')}, '/admin/tablero-area/administrar', 'Áreas y líderes', ${seccion == 'tablero-area-administrar'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CLASE_ADMINISTRAR')}, '/talento-humano/clases', 'Clases', ${seccion == 'clases'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('USUARIO_ADMINISTRAR')}, '/talento-humano/usuarios', 'Usuarios', ${seccion == 'usuarios'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('ORGANIGRAMA_ADMINISTRAR')}, '/talento-humano/organigrama', 'Editar organigrama', ${seccion == 'organigrama'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CAPACITACION_ADMINISTRAR')}, '/talento-humano/capacitaciones', 'Cursos', ${seccion == 'capacitaciones-admin'}, ${null})}"></li>
-                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('DOCUMENTO_INSTITUCIONAL_ADMINISTRAR')}, '/talento-humano/documentos-institucionales', 'Documentos institucionales', ${seccion == 'documentos-institucionales-admin'}, ${null})}"></li>
-
-                <li class="pt-3">
-                    <span class="px-3 text-[10px] uppercase tracking-[0.14em] text-neutral-600">Próximamente</span>
-                </li>
-                <li th:replace="~{fragments/app-layout :: pendiente('Reportes')}"></li>
-                <li th:replace="~{fragments/app-layout :: pendiente('Directorio')}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('CLASE_ADMINISTRAR')}, '/rectoria/clases', 'Clases', ${seccion == 'clases'}, ${null})}"></li>
+                <li th:replace="~{fragments/app-layout :: item(${@capacidades.puede('USUARIO_ADMINISTRAR')}, '/rectoria/usuarios', 'Usuarios', ${seccion == 'usuarios'}, ${null})}"></li>
             </ul>
         </nav>
 
@@ -189,14 +154,6 @@
 
 <script th:src="@{/js/core.js}" defer></script>
 <script th:src="@{/js/shell.js}" defer></script>
-<script th:src="@{/js/muro.js}" defer></script>
-<script th:src="@{/js/tablero.js}" defer></script>
-<script th:src="@{/js/tablero-area.js}" defer></script>
-<script th:src="@{/js/carousel.js}" defer></script>
-<script th:src="@{/js/capacitaciones.js}" defer></script>
-<script th:src="@{/js/catalogo-filtrable.js}" defer></script>
-<script th:src="@{/js/organigrama.js}" defer></script>
-<script th:src="@{/js/perfil.js}" defer></script>
 <script th:src="@{/js/asistencia-proyeccion.js}" defer></script>
 <script th:src="@{/js/asistencia-estudiante.js}" defer></script>
 </body>
@@ -217,14 +174,4 @@
         <span th:if="${contador != null and contador > 0}"
               class="tag tag-accent ml-auto" th:text="${contador}">0</span>
     </a>
-</li>
-
-<!-- Apartado del mapa que todavía no existe. Se ve, pero no engaña: no es un enlace. -->
-<li th:fragment="pendiente(etiqueta)">
-    <span class="flex cursor-not-allowed items-center gap-3 px-3 py-2.5 text-neutral-500"
-          th:title="|${etiqueta}: llega en un hito posterior|">
-        <span class="h-1.5 w-1.5 shrink-0 border border-neutral-500" aria-hidden="true"></span>
-        <span th:text="${etiqueta}">Sección</span>
-    </span>
-</li>
-</html>
+</li></html>

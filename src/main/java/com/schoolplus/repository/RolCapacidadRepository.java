@@ -16,7 +16,7 @@ public interface RolCapacidadRepository extends JpaRepository<RolCapacidad, RolC
      *
      * <p>Filtra por {@code habilitado}, así que las filas marcadas con
      * {@code pendiente_confirmacion} —los ❔ de la matriz del prompt— quedan fuera hasta
-     * que Talento Humano las confirme.</p>
+     * que la administración las confirme.</p>
      *
      * <p>{@code distinct} porque una persona con dos roles puede recibir la misma
      * capacidad por ambos.</p>

@@ -25,12 +25,12 @@ import java.util.Map;
 /**
  * Administración de clases: crear, asignar profesor, poner el horario y matricular.
  *
- * <p>Vive bajo {@code /talento-humano/**} —rectoría y ADMIN— porque es la misma gente que ya
- * administra usuarios y organigrama. Quién entra de verdad lo decide la capacidad
+ * <p>Vive bajo {@code /rectoria/**} —rectoría y ADMIN— porque es la misma gente que ya
+ * administra usuarios. Quién entra de verdad lo decide la capacidad
  * {@code CLASE_ADMINISTRAR}.</p>
  */
 @Controller
-@RequestMapping("/talento-humano/clases")
+@RequestMapping("/rectoria/clases")
 public class ClaseAdminController {
 
     private final ClaseService claseService;
@@ -64,10 +64,10 @@ public class ClaseAdminController {
         try {
             Clase clase = claseService.crear(actor, nombre, asignatura, grupo, periodo, profesorId);
             redirect.addFlashAttribute("aviso", "Clase creada. Agrégale el horario y matricula estudiantes.");
-            return "redirect:/talento-humano/clases/" + clase.getId();
+            return "redirect:/rectoria/clases/" + clase.getId();
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
-            return "redirect:/talento-humano/clases";
+            return "redirect:/rectoria/clases";
         }
     }
 
@@ -78,7 +78,7 @@ public class ClaseAdminController {
             modelo.addAttribute("clase", claseService.buscar(id));
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
-            return "redirect:/talento-humano/clases";
+            return "redirect:/rectoria/clases";
         }
         modelo.addAttribute("horarios", claseService.horariosDe(id));
         modelo.addAttribute("inscritos", claseService.inscritosDe(id));
@@ -104,7 +104,7 @@ public class ClaseAdminController {
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/talento-humano/clases/" + id;
+        return "redirect:/rectoria/clases/" + id;
     }
 
     @PostMapping("/{id}/estado")
@@ -118,7 +118,7 @@ public class ClaseAdminController {
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/talento-humano/clases/" + id;
+        return "redirect:/rectoria/clases/" + id;
     }
 
     // ── Horario ──────────────────────────────────────────────────────────────
@@ -137,7 +137,7 @@ public class ClaseAdminController {
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/talento-humano/clases/" + id;
+        return "redirect:/rectoria/clases/" + id;
     }
 
     @PostMapping("/{id}/horarios/{horarioId}/eliminar")
@@ -150,7 +150,7 @@ public class ClaseAdminController {
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/talento-humano/clases/" + id;
+        return "redirect:/rectoria/clases/" + id;
     }
 
     // ── Matrícula ────────────────────────────────────────────────────────────
@@ -176,7 +176,7 @@ public class ClaseAdminController {
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/talento-humano/clases/" + id;
+        return "redirect:/rectoria/clases/" + id;
     }
 
     @PostMapping("/{id}/inscripciones/{estudianteId}/retirar")
@@ -189,6 +189,6 @@ public class ClaseAdminController {
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/talento-humano/clases/" + id;
+        return "redirect:/rectoria/clases/" + id;
     }
 }

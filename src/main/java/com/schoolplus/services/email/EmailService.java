@@ -114,27 +114,6 @@ public class EmailService {
     }
 
     /**
-     * Aviso del flujo de solicitudes (§4.4): a quien le toca decidir, y al solicitante
-     * cuando ya decidieron sobre lo suyo.
-     *
-     * <p>Lleva enlace al portal en vez de a una pantalla concreta: la decisión se toma en
-     * la bandeja, y llevar a cada quien a su bandeja exige saber su rol, que aquí no se
-     * sabe.</p>
-     */
-    public EmailSendResult enviarAvisoSolicitud(String para, String nombre, String asunto,
-                                                String antetitulo, String cuerpo) {
-        String contenido = plantilla(
-                antetitulo,
-                escape(nombre),
-                cuerpo,
-                "Abrir School_Plus",
-                baseUrl,
-                "Este aviso es automático. Si no esperabas este mensaje, escribe a Talento Humano.");
-
-        return enviarCorreo(para, asunto, contenido);
-    }
-
-    /**
      * Lienzo común de los correos. Estilos en línea y tabla de ancho fijo: es lo único que
      * los clientes de correo pintan igual (Outlook ignora la mitad de CSS moderno).
      * Los colores son copia literal de los tokens de {@code styles.css}: un cliente de

@@ -18,40 +18,23 @@ import java.util.Collection;
  */
 public final class RutasPorRol {
 
-    /**
-     * Dónde aterriza TODO EL MUNDO al entrar: el portal es la pestaña inicial de los
-     * cuatro roles (§4.7).
-     *
-     * <p>No es lo mismo que el panel. Antes el login llevaba directamente al panel del
-     * rol, y como ese panel no enlazaba al muro, el portal quedaba inalcanzable haciendo
-     * clic aunque la ruta respondiera. El panel sigue existiendo y se llega a él desde el
-     * menú lateral.</p>
-     */
-    public static final String PORTAL = "/portal";
-
     public static final String RUTA_ADMIN = "/admin";
-    public static final String RUTA_SUPERVISOR = "/talento-humano";
+    public static final String RUTA_SUPERVISOR = "/rectoria";
     public static final String RUTA_COORDINADOR = "/coordinacion";
     public static final String RUTA_USUARIO = "/mi-espacio";
 
     /**
-     * El estudiante no tiene panel ni espacio personal: lo suyo es registrar asistencia.
-     * Llevarlo al portal sería darle la bienvenida a una pantalla en la que no puede hacer
-     * nada.
+     * El estudiante no tiene panel: lo suyo es registrar asistencia. Llevarlo a un panel
+     * sería darle la bienvenida a una pantalla en la que no puede hacer nada.
      */
     public static final String RUTA_ESTUDIANTE = "/estudiante/asistencia";
 
     private RutasPorRol() {
     }
 
-    /** Destino tras iniciar sesión. Igual para los cuatro roles del personal. */
-    public static String trasIniciarSesion() {
-        return PORTAL;
-    }
-
-    /** Igual, pero mandando a los estudiantes a su pantalla de asistencia. */
+    /** Destino tras iniciar sesión: el panel del rol, o la asistencia si es estudiante. */
     public static String trasIniciarSesion(Collection<? extends GrantedAuthority> autoridades) {
-        return esSoloEstudiante(autoridades) ? RUTA_ESTUDIANTE : PORTAL;
+        return destinoDe(autoridades);
     }
 
     /** Estudiante y nada más. Un docente que además estudie algo sigue siendo personal. */

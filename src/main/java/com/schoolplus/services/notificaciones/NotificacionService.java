@@ -12,12 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
  * La campanita: crea la notificación, la deja guardada, y si esa persona tiene una
  * pestaña abierta ahora mismo se la empuja por WebSocket.
  *
- * <p>Se llama desde cuatro sitios (D-025): {@code NotificadorSolicitudes} (pendiente y
- * decidida), {@code MuroService} (comentario y reacción sobre lo tuyo),
- * {@code DocumentoService} (documento restringido nuevo) y
- * {@code TableroRecordatorioJob} (vencimiento). Ninguno de los cuatro depende de que el
- * WebSocket esté conectado: la fila en {@code notificacion} es la fuente de verdad, el
- * socket es solo el aviso en vivo.</p>
+ * <p>La fila en {@code notificacion} es la fuente de verdad; el socket es solo el aviso en
+ * vivo, así que quien llame no depende de que la persona tenga una pestaña abierta.</p>
  */
 @Service
 public class NotificacionService {
@@ -32,8 +28,7 @@ public class NotificacionService {
     }
 
     /**
-     * Crea y empuja. No es {@code @Async} a propósito, a diferencia del correo de
-     * {@code NotificadorSolicitudes}: guardar una fila es rápido y no vale la pena la
+     * Crea y empuja. No es {@code @Async} a propósito: guardar una fila es rápido y no vale la pena la
      * complejidad de otro hilo por esto. Quien llama decide si el suyo se hace async.
      */
     @Transactional

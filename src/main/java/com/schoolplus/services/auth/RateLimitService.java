@@ -92,7 +92,7 @@ public class RateLimitService {
             return false;
         } catch (RuntimeException e) {
             // Si la consulta falla, se deja pasar: es preferible a dejar a toda la
-            // compañía sin poder entrar por un problema de la bitácora.
+            // institución sin poder entrar por un problema de la bitácora.
             log.error("No se pudo evaluar el límite de intentos ({}): {}", evento, e.getMessage(), e);
             return false;
         }

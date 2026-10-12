@@ -13,13 +13,11 @@ import java.util.regex.Pattern;
  * Validación de los datos de registro y de la política de contraseñas.
  *
  * <p>Origen: un proyecto de referencia (services/auth/ValidationService.java). Se conservan sus
- * expresiones regulares, que son buenas. Dos cambios respecto al original
+ * expresiones regulares, que son buenas. Un cambio respecto al original
  * (docs/DECISIONES.md):</p>
  * <ul>
  *   <li>La contraseña mínima sube de <strong>6 a 10</strong> caracteres, y se exige mezcla
  *       de letras y dígitos más una lista de claves comunes.</li>
- *   <li>Los catálogos de sede y cargo ya no son {@code Set.of()} en el código: son tablas.
- *       Su validación vive en {@code RegisterService}, contra la base de datos.</li>
  * </ul>
  */
 @Service
@@ -41,7 +39,7 @@ public class ValidationService {
             "contrasena", "contraseña", "password", "password1", "passw0rd",
             "12345678", "123456789", "1234567890", "qwertyuiop", "qwerty123",
             "administrador", "schoolplus", "schoolplus1", "school_plus",
-            "bienvenido", "bienvenido1", "talentohumano", "iloveyou1");
+            "bienvenido", "bienvenido1", "iloveyou1");
 
     private final int longitudMinima;
 
@@ -58,14 +56,6 @@ public class ValidationService {
         List<String> errores = new ArrayList<>(
                 validarDatosBasicos(form.getNombre(), form.getEmail(), form.getCedula(), form.getTelefono()));
 
-        if (vacio(form.getSedeId())) {
-            errores.add("Debes seleccionar una sede.");
-        }
-
-        if (vacio(form.getCargoId())) {
-            errores.add("Debes seleccionar un cargo.");
-        }
-
         errores.addAll(validarPassword(form.getPassword(), form.getConfirmPassword(), form.getNombre(), form.getEmail()));
 
         return errores;
@@ -73,7 +63,7 @@ public class ValidationService {
 
     /**
      * Los cuatro campos de identidad que comparten el auto-registro y el alta manual
-     * que hace RH desde el panel de administración. No consulta la base de datos:
+     * desde el panel de administración. No consulta la base de datos:
      * unicidad de correo/cédula la valida quien llama, contra el repositorio.
      */
     public List<String> validarDatosBasicos(String nombre, String email, String cedula, String telefono) {

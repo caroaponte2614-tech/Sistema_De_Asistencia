@@ -44,9 +44,8 @@ public class LoginAuditHandlers {
      * A dónde va cada quien nada más entrar.
      *
      * <p>Si venía de escanear un QR de asistencia con la cámara del teléfono, el escaneo
-     * quedó guardado en su sesión: se le lleva derecho a confirmarlo. Quien no, al portal
-     * —la pestaña inicial de los cuatro roles del personal— o, si es estudiante, a su
-     * pantalla de asistencia.</p>
+     * quedó guardado en su sesión: se le lleva derecho a confirmarlo. Quien no, al panel de
+     * su rol o, si es estudiante, a su pantalla de asistencia.</p>
      */
     private String destinoTrasEntrar(HttpServletRequest peticion, Authentication autenticacion) {
         HttpSession sesion = peticion.getSession(false);

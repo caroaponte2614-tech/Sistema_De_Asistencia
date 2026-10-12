@@ -7,8 +7,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * Plataforma escolar School_Plus.
  *
- * <p>{@code @EnableScheduling}: lo que dispara a {@code TableroRecordatorioJob}, el
- * único {@code @Scheduled} de la aplicación por ahora.</p>
+ * <p>{@code @EnableScheduling}: lo que dispara a {@code CierreAutomaticoJob}, el cierre
+ * automático de las sesiones de asistencia olvidadas.</p>
  */
 @SpringBootApplication
 @EnableScheduling

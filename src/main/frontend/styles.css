@@ -10,7 +10,7 @@
 
    Los tokens se copian TAL CUAL del prototipo. Decisión del usuario (2026-08-26):
    manda este sistema en la aplicación entera —autenticación, paneles, sidebar,
-   tablero y muro—, no solo en el login. Ver docs/DECISIONES.md D-009 y
+   clases y asistencia—, no solo en el login. Ver docs/DECISIONES.md D-009 y
    docs/DECISIONES.md
 
    Este archivo es la ÚNICA fuente de verdad de los tokens: `tailwind.config.js`
@@ -250,7 +250,7 @@
      Dos pesos deliberados, para que la jerarquía visual sea una decisión y no un
      accidente de qué borde se copió y pegó:
        .card         superficie tranquila, agrupa contenido secundario o repetido
-                     (posts del muro, tarjetas de bandeja, columnas del tablero).
+                     (filas de listados, tarjetas de clases).
                      Borde fino + sombra suave: separa sin gritar.
        .card-strong  la caja pide acción (redactar, dar de alta, formularios cortos).
                      Reforma 2026-08-28: ya no es un marco de 2px sólido —eran las
@@ -340,31 +340,6 @@
   .table td { padding: var(--space-2); border-bottom: 1px solid var(--color-divider); }
   .table tbody tr { transition: background-color .12s ease; }
   .table tbody tr:hover { background: color-mix(in srgb, var(--color-text) 4%, transparent); }
-
-  /* — tarjeta del tablero (kanban) —
-     Separada de `.card` porque necesita estados que una tarjeta normal no pide:
-     asa de arrastre (grab/grabbing) y un hueco de acción que solo aparece al pasar
-     el mouse, para no ensuciar la tarjeta con un botón de borrar siempre visible. */
-  .tablero-columna {
-    background: var(--color-surface); border: 1px solid var(--color-divider);
-    border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
-  }
-  .tablero-columna:has([data-sobre-columna]) { border-color: var(--color-accent); box-shadow: var(--shadow-md); }
-  .tablero-tarjeta {
-    background: var(--color-bg); border: 1px solid var(--color-divider);
-    border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
-    cursor: grab; transition: box-shadow .15s ease, border-color .15s ease, opacity .15s ease;
-  }
-  .tablero-tarjeta:hover { box-shadow: var(--shadow-md); border-color: color-mix(in srgb, var(--color-text) 30%, transparent); }
-  .tablero-tarjeta:active { cursor: grabbing; }
-  .tablero-tarjeta.arrastrando { opacity: 0.4; }
-  .tablero-borrar {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px; flex: none; border-radius: 999px;
-    border: 0; background: transparent; color: var(--color-neutral-500);
-    cursor: pointer; line-height: 1; transition: background-color .15s ease, color .15s ease;
-  }
-  .tablero-borrar:hover { background: var(--color-danger-100); color: var(--color-danger); }
 
   /* — radios y segmentados — */
   .radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
@@ -461,129 +436,4 @@
     transition: none !important;
     animation: none !important;
   }
-}
-
-/* ============================================================================
-   Barras de resultado de las encuestas del muro.
-
-   FUERA de @layer components a propósito: el ancho se elige desde Thymeleaf con
-   un nombre de clase construido al vuelo (barra-0 … barra-100), y Tailwind, que
-   compila leyendo el código fuente, no puede verlo. Dentro de una capa lo podaría
-   por no encontrar ningún uso; aquí sobrevive.
-
-   Alternativas descartadas: style="width:37%" (la CSP prohíbe estilos en línea)
-   y w-[37%] (esa clase no existiría en el CSS compilado).
-   ========================================================================== */
-.barra-0 { width: 0%; }
-.barra-5 { width: 5%; }
-.barra-10 { width: 10%; }
-.barra-15 { width: 15%; }
-.barra-20 { width: 20%; }
-.barra-25 { width: 25%; }
-.barra-30 { width: 30%; }
-.barra-35 { width: 35%; }
-.barra-40 { width: 40%; }
-.barra-45 { width: 45%; }
-.barra-50 { width: 50%; }
-.barra-55 { width: 55%; }
-.barra-60 { width: 60%; }
-.barra-65 { width: 65%; }
-.barra-70 { width: 70%; }
-.barra-75 { width: 75%; }
-.barra-80 { width: 80%; }
-.barra-85 { width: 85%; }
-.barra-90 { width: 90%; }
-.barra-95 { width: 95%; }
-.barra-100 { width: 100%; }
-
-/* ============================================================================
-   Organigrama gráfico: árbol con líneas conectoras en CSS puro (§ organigrama).
-
-   Misma técnica que cualquier "pure CSS org chart": cada <ul> anidado es un
-   flexbox centrado, y cada <li> dibuja su línea vertical hacia el padre
-   (::before) y su tramo de línea horizontal hacia los hermanos (::after). Sin
-   librería de JS: la CSP no admite scripts de CDN y esto no lo necesita.
-
-   FUERA de @layer por la misma razón que las .barra-*: son clases que Tailwind
-   nunca tendría que purgar, pero como esto no son utilidades sino un componente
-   completo, es más simple declararlo aparte que pelear con @apply.
-   ========================================================================== */
-.organigrama-grafico-envoltorio {
-  overflow-x: auto;
-  padding: var(--space-4) 0;
-}
-
-.organigrama-grafico {
-  display: inline-flex;
-  justify-content: center;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  transform-origin: top left;
-  transition: transform 0.15s ease;
-}
-
-.organigrama-grafico ul {
-  display: flex;
-  justify-content: center;
-  list-style: none;
-  margin: 0;
-  padding-top: var(--space-6);
-}
-
-.organigrama-grafico li {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  padding: var(--space-6) var(--space-3) 0 var(--space-3);
-}
-
-/* Línea vertical: del nodo hacia el tramo horizontal de sus hermanos. */
-.organigrama-grafico li::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 0;
-  height: var(--space-6);
-  border-left: 1px solid var(--color-divider);
-}
-
-/* Línea horizontal: conecta a un nodo con sus hermanos, a la altura del padre. */
-.organigrama-grafico li::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  border-top: 1px solid var(--color-divider);
-}
-
-.organigrama-grafico li:first-child::after { left: 50%; }
-.organigrama-grafico li:last-child::after { right: 50%; }
-.organigrama-grafico li:only-child::after { display: none; }
-
-/* La raíz (los que no tienen jefe) no tiene de dónde colgar una línea. */
-.organigrama-grafico > li::before,
-.organigrama-grafico > li::after {
-  display: none;
-}
-
-.organigrama-nodo {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  white-space: nowrap;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-divider);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
-  padding: var(--space-2) var(--space-3);
-  cursor: default;
-}
-
-.organigrama-nodo[data-tiene-hijos="true"] {
-  cursor: pointer;
 }

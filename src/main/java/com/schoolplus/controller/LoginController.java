@@ -30,7 +30,7 @@ public class LoginController {
                 && autenticacion.isAuthenticated()
                 && !"anonymousUser".equals(autenticacion.getPrincipal());
 
-        // Quien ya entró no ve el formulario otra vez: va al portal.
+        // Quien ya entró no ve el formulario otra vez: va a su panel.
         if (autenticado) {
             return "redirect:" + RutasPorRol.trasIniciarSesion(autenticacion.getAuthorities());
         }

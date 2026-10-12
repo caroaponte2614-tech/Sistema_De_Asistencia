@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Alta de usuario (D-021). Nace sin contraseña: la persona la fija con "Olvidé mi
+<!-- Alta de usuario. Nace sin contraseña: la persona la fija con "Olvidé mi
      contraseña", igual que un usuario migrado sin hash. El rol tampoco se toca acá: nace
      USUARIO y se sube aparte, desde la ficha, un acto deliberado. -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
@@ -8,13 +8,13 @@
 <th:block th:fragment="seccion">
 
     <section>
-        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Talento Humano</span>
+        <span class="text-[12px] uppercase tracking-[0.14em] text-accent-700">Administración</span>
         <h1 class="m-0 mt-3 text-[40px] leading-[1.05] tracking-[-0.03em]">Nuevo usuario</h1>
         <div class="mt-5 h-0.5 w-24 bg-accent-700"></div>
     </section>
 
     <section class="card-strong max-w-[640px] p-6">
-        <form th:action="@{/talento-humano/usuarios}" method="post" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <form th:action="@{/rectoria/usuarios}" method="post" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div class="sm:col-span-2">
                 <label class="etiqueta-campo" for="nombre">Nombre completo</label>
                 <input id="nombre" name="nombre" type="text" required maxlength="110" class="input">
@@ -31,31 +31,6 @@
                 <label class="etiqueta-campo" for="telefono">Teléfono</label>
                 <input id="telefono" name="telefono" type="text" required maxlength="15" class="input">
             </div>
-            <div>
-                <label class="etiqueta-campo" for="sedeId">Sede</label>
-                <select id="sedeId" name="sedeId" class="input">
-                    <option value="">— Sin asignar —</option>
-                    <option th:each="s : ${sedes}" th:value="${s.id}" th:text="${s.nombre}">Sede</option>
-                </select>
-            </div>
-            <div>
-                <label class="etiqueta-campo" for="cargoId">Cargo</label>
-                <select id="cargoId" name="cargoId" class="input">
-                    <option value="">— Sin asignar —</option>
-                    <option th:each="c : ${cargosDisponibles}" th:value="${c.id}" th:text="${c.nombre}">Cargo</option>
-                </select>
-            </div>
-            <div>
-                <label class="etiqueta-campo" for="areaId">Área</label>
-                <select id="areaId" name="areaId" class="input">
-                    <option value="">— Sin asignar —</option>
-                    <option th:each="a : ${areas}" th:value="${a.id}" th:text="${a.nombre}">Área</option>
-                </select>
-            </div>
-            <div>
-                <label class="etiqueta-campo" for="fechaIngreso">Fecha de ingreso</label>
-                <input id="fechaIngreso" name="fechaIngreso" type="date" class="input">
-            </div>
             <div class="sm:col-span-2">
                 <label class="etiqueta-campo" for="fechaNacimiento">Fecha de nacimiento</label>
                 <input id="fechaNacimiento" name="fechaNacimiento" type="date" class="input">
@@ -65,7 +40,7 @@
                 <button type="submit" class="btn btn-primary flex-1 py-3 text-[13px] uppercase tracking-[0.06em]">
                     Crear usuario
                 </button>
-                <a th:href="@{/talento-humano/usuarios}"
+                <a th:href="@{/rectoria/usuarios}"
                    class="btn btn-secondary px-5 py-3 text-[13px] uppercase tracking-[0.06em]">
                     Cancelar
                 </a>

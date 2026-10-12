@@ -128,7 +128,7 @@ public class AsistenciaReporteService {
     private String alcanceDe(Usuario actor) {
         Ambito ambito = capacidades.ambitoDe(Capacidades.ASISTENCIA_REPORTE)
                 .orElseThrow(() -> new IllegalArgumentException("No tienes permiso para ver reportes de asistencia."));
-        // PROPIO (y AREA, que aquí significa lo mismo) queda acotado a las clases del actor.
+        // PROPIO queda acotado a las clases del actor.
         return ambito == Ambito.TODOS ? null : actor.getId();
     }
 

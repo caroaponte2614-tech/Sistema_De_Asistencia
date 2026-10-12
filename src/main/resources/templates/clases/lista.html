@@ -16,7 +16,7 @@
     </section>
 
     <section>
-        <form th:action="@{/talento-humano/clases}" method="post" class="card-strong">
+        <form th:action="@{/rectoria/clases}" method="post" class="card-strong">
             <span class="card-kicker">Nueva clase</span>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="field">
@@ -69,7 +69,7 @@
                 <tbody>
                 <tr th:each="c : ${clases}">
                     <td class="pl-5">
-                        <a th:href="@{'/talento-humano/clases/' + ${c.id}}" th:text="${c.nombre}"
+                        <a th:href="@{'/rectoria/clases/' + ${c.id}}" th:text="${c.nombre}"
                            class="text-accent-700 hover:underline">Clase</a>
                     </td>
                     <td th:text="${c.asignatura}">Asignatura</td>

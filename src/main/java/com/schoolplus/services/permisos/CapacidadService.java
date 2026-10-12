@@ -24,15 +24,12 @@ import java.util.stream.Collectors;
  * ni un {@code if} por rol: se pregunta a {@code rol_capacidad} y se responde.</p>
  *
  * <p>El bean se llama {@code capacidades} para poder escribirlo en SpEL:
- * {@code @PreAuthorize("@capacidades.puede('REPORTE_GENERAR')")}, y también desde
+ * {@code @PreAuthorize("@capacidades.puede('CLASE_ADMINISTRAR')")}, y también desde
  * Thymeleaf, para no pintar botones que luego van a dar 403.</p>
  *
  * <h2>El ámbito</h2>
  * Tener una capacidad no basta: hay que saber sobre quién. {@link Ambito#PROPIO} es uno
- * mismo, {@link Ambito#AREA} es la gente a cargo y {@link Ambito#TODOS} es la compañía.
- * "A cargo" se resuelve por {@code usuario.coordinador_id} —la relación que el §4.4
- * declara autoritativa— y no por coincidencia de área: dos personas pueden compartir
- * área sin que una sea jefe de la otra.
+ * mismo y {@link Ambito#TODOS} es toda la institución.
  */
 @Service("capacidades")
 public class CapacidadService {
@@ -65,8 +62,8 @@ public class CapacidadService {
     /**
      * ¿Puede ejercerla <em>sobre esta persona</em>?
      *
-     * <p>Es la pregunta que evita la fuga clásica de estos portales: tener el permiso de
-     * "ver documentos" y usarlo contra el expediente de otro.</p>
+     * <p>Es la pregunta que evita la fuga clásica de estos portales: tener un permiso y
+     * usarlo contra los datos de otro.</p>
      */
     @Transactional(readOnly = true)
     public boolean puedeSobre(String capacidad, String usuarioObjetivoId) {
@@ -77,7 +74,6 @@ public class CapacidadService {
         return switch (ambito.get()) {
             case TODOS -> true;
             case PROPIO -> usuarioObjetivoId.equals(idDelActor().orElse(null));
-            case AREA -> esMio(usuarioObjetivoId);
         };
     }
 
@@ -97,18 +93,6 @@ public class CapacidadService {
     }
 
     // ── Interno ──────────────────────────────────────────────────────────────
-
-    /** ¿Esa persona me tiene a mí como coordinador? */
-    private boolean esMio(String usuarioObjetivoId) {
-        String actorId = idDelActor().orElse(null);
-        if (actorId == null) {
-            return false;
-        }
-        return usuarioRepository.findById(usuarioObjetivoId)
-                .map(Usuario::getCoordinador)
-                .map(coordinador -> actorId.equals(coordinador.getId()))
-                .orElse(false);
-    }
 
     private Optional<String> idDelActor() {
         return actor().map(Usuario::getId);

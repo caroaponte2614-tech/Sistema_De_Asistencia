@@ -1,8 +1,7 @@
 package com.schoolplus.controller;
 
 import com.schoolplus.configuration.SecurityConfig;
-import com.schoolplus.repository.CargoRepository;
-import com.schoolplus.repository.SedeRepository;
+import com.schoolplus.repository.ClaseRepository;
 import com.schoolplus.repository.UsuarioRepository;
 import com.schoolplus.services.auditoria.AuditoriaAccesoService;
 import com.schoolplus.services.auth.RateLimitService;
@@ -66,9 +65,7 @@ class VistasAuthTest {
     @MockitoBean
     private UsuarioRepository usuarioRepository;
     @MockitoBean
-    private SedeRepository sedeRepository;
-    @MockitoBean
-    private CargoRepository cargoRepository;
+    private ClaseRepository claseRepository;
     @MockitoBean
     private RegisterService registerService;
     @MockitoBean
@@ -79,13 +76,7 @@ class VistasAuthTest {
     private DataSource dataSource;
 
     // @WebMvcTest instancia TODOS los @ControllerAdvice del proyecto, no solo los que
-    // aplican a estos controladores, así que BandejasAdvice también necesita sus piezas.
-    @MockitoBean
-    private com.schoolplus.repository.SolicitudRepository solicitudRepository;
-    @MockitoBean
-    private com.schoolplus.repository.RegistroHorasExtraRepository registroHorasExtraRepository;
-    @MockitoBean
-    private com.schoolplus.services.permisos.CapacidadService capacidadService;
+    // aplican a estos controladores, así que ShellAdvice también necesita sus piezas.
     @MockitoBean
     private com.schoolplus.services.cuenta.CuentaService cuentaService;
 

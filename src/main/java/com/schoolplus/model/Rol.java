@@ -29,7 +29,7 @@ public class Rol {
 
     /**
      * Estudiante matriculado. Es el único rol que no es "personal de la institución": no
-     * tiene solicitudes, ni tablero, ni expediente — solo su asistencia.
+     * toma asistencia ni administra nada — solo registra la suya.
      */
     public static final String ESTUDIANTE = "ESTUDIANTE";
 

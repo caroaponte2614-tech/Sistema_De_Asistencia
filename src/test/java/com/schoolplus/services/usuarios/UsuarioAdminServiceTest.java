@@ -3,10 +3,7 @@ package com.schoolplus.services.usuarios;
 import com.schoolplus.model.EstadoUsuario;
 import com.schoolplus.model.Rol;
 import com.schoolplus.model.Usuario;
-import com.schoolplus.repository.AreaRepository;
-import com.schoolplus.repository.CargoRepository;
 import com.schoolplus.repository.RolRepository;
-import com.schoolplus.repository.SedeRepository;
 import com.schoolplus.repository.UsuarioRepository;
 import com.schoolplus.services.auth.ValidationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-/** El CRUD de usuarios que RH opera desde su panel (D-017). */
+/** El CRUD de usuarios del panel de administración. */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class UsuarioAdminServiceTest {
@@ -34,20 +31,13 @@ class UsuarioAdminServiceTest {
     @Mock
     private UsuarioRepository usuarioRepository;
     @Mock
-    private SedeRepository sedeRepository;
-    @Mock
-    private CargoRepository cargoRepository;
-    @Mock
-    private AreaRepository areaRepository;
-    @Mock
     private RolRepository rolRepository;
 
     private UsuarioAdminService admin;
 
     @BeforeEach
     void crearService() {
-        admin = new UsuarioAdminService(usuarioRepository, sedeRepository, cargoRepository,
-                areaRepository, rolRepository, new ValidationService(10));
+        admin = new UsuarioAdminService(usuarioRepository, rolRepository, new ValidationService(10));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
@@ -135,7 +125,7 @@ class UsuarioAdminServiceTest {
     }
 
     private DatosUsuario datos(String nombre, String email, String cedula) {
-        return new DatosUsuario(nombre, email, cedula, "3001234567", null, null, null, null, null);
+        return new DatosUsuario(nombre, email, cedula, "3001234567", null);
     }
 
     private Usuario usuarioExistente(String id, String email, String cedula) {

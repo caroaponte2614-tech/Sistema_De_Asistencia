@@ -2,8 +2,7 @@
 <!--
   Auto-registro de cuenta.
   Flujo portado de un proyecto de referencia (services/auth/RegisterService.java) — el único
-  de los tres repos donde sigue vivo. Los catálogos de sede y cargo salen de la base
-  de datos (en el original eran Set.of() inmutables en ValidationService).
+  de los tres repos donde sigue vivo.
   Estética: la misma del login (los prototipos de diseño (login)).
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
@@ -48,23 +47,6 @@
                 <label for="telefono" class="etiqueta-campo">Teléfono</label>
                 <input id="telefono" th:field="*{telefono}" type="tel" required inputmode="numeric"
                        maxlength="15" placeholder="3000000000" autocomplete="tel" class="input-linea">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-[22px] sm:grid-cols-2">
-            <div class="flex flex-col gap-2">
-                <label for="sedeId" class="etiqueta-campo">Sede</label>
-                <select id="sedeId" th:field="*{sedeId}" required class="input-linea">
-                    <option value="">Selecciona…</option>
-                    <option th:each="sede : ${sedes}" th:value="${sede.id}" th:text="${sede.nombre}">Sede</option>
-                </select>
-            </div>
-            <div class="flex flex-col gap-2">
-                <label for="cargoId" class="etiqueta-campo">Cargo</label>
-                <select id="cargoId" th:field="*{cargoId}" required class="input-linea">
-                    <option value="">Selecciona…</option>
-                    <option th:each="cargo : ${cargos}" th:value="${cargo.id}" th:text="${cargo.nombre}">Cargo</option>
-                </select>
             </div>
         </div>
 

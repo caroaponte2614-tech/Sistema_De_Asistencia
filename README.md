@@ -1,10 +1,8 @@
 # School_Plus
 
-Plataforma escolar: docentes, estudiantes, clases, capacitaciones, documentos, solicitudes
-y portal institucional. Spring Boot 4 · Java 21 · MySQL/MariaDB · Thymeleaf + Tailwind.
+Plataforma escolar académica: docentes, estudiantes, clases y asistencia con QR. Spring Boot 4 · Java 21 · MySQL/MariaDB · Thymeleaf + Tailwind.
 
-Corre en local con comandos normales: sin Docker y sin servicios externos. Los archivos
-subidos se guardan en una carpeta del disco.
+Corre en local con comandos normales: sin Docker y sin servicios externos.
 
 ---
 
@@ -77,8 +75,8 @@ Ingresa con el correo y la contraseña de `BOOTSTRAP_ADMIN_*`. Desde **Administr
 Usuarios** se crean las demás cuentas y se asignan sus roles.
 
 Para probar todos los roles de una vez, `BOOTSTRAP_DEMO_USUARIOS=true` crea
-`supervisor@`, `coordinador@` y `colaborador@` con el mismo dominio y contraseña que el
-administrador (solo en una base sin ADMIN; nunca en producción).
+`supervisor@` (rectoría), `coordinador@` y `docente@` con el mismo dominio y contraseña
+que el administrador (solo en una base sin ADMIN; nunca en producción).
 
 ---
 
@@ -101,26 +99,11 @@ cd src/main/frontend && npm install && npm run watch
 `src/main/resources/static/main.css` es **salida compilada**: no se edita a mano ni se
 versiona. Se genera desde `src/main/frontend/styles.css`.
 
-## Archivos subidos
-
-Se guardan en `STORAGE_PATH` (por defecto `./uploads`, ignorada por git), en subcarpetas por
-tipo: `documentos/`, `soportes/`, `institucionales/`, `videos/`, `imagenes/`,
-`certificados/`.
-
-- Cada archivo recibe un nombre UUID; el nombre original solo se guarda para mostrarlo.
-- Por tipo se validan extensión, tamaño máximo y firma binaria del contenido
-  (`services/documentos/TipoArchivo` y `FormatoArchivo`).
-- La base guarda rutas **relativas** (`videos/<uuid>.mp4`), nunca URLs.
-- Nada de esa carpeta se sirve como estático: todo sale por un controlador que verifica
-  permisos antes de entregar los bytes.
-
-Para respaldar los archivos basta con copiar la carpeta junto con un volcado de la base.
-
 ## Estructura
 
 ```
 src/main/java/com/schoolplus/
-├── configuration/     seguridad, WebSocket, almacenamiento, arranque
+├── configuration/     seguridad, WebSocket, arranque
 ├── controller/        controladores MVC (Thymeleaf) y REST (/api/v1/...)
 ├── dto/               formularios y vistas
 ├── model/             entidades JPA y enums
@@ -145,7 +128,7 @@ El esquema lo manda **Flyway** (`spring.jpa.hibernate.ddl-auto=validate`).
 ## Asistencia con QR
 
 El módulo nuevo de School_Plus. Una **clase** es una asignatura con su profesor, su horario
-y sus estudiantes matriculados (`/talento-humano/clases`).
+y sus estudiantes matriculados (`/rectoria/clases`).
 
 ### Cómo se usa
 
@@ -223,16 +206,15 @@ y los aplica `services/permisos/CapacidadService`, expuesto como bean `capacidad
 @PreAuthorize("@capacidades.puede('USUARIO_ADMINISTRAR')")
 ```
 
-Apagar una fila en la base cierra la ruta sin recompilar. El ámbito (`PROPIO` / `AREA` /
-`TODOS`) se comprueba con `capacidades.puedeSobre(codigo, usuarioId)`. El menú lateral se
+Apagar una fila en la base cierra la ruta sin recompilar. El ámbito (`PROPIO` / `TODOS`) se comprueba con `capacidades.puedeSobre(codigo, usuarioId)`. El menú lateral se
 pinta con el mismo bean, así que nunca muestra un enlace que daría 403.
 
 | Rol | Uso en School_Plus |
 |---|---|
 | `ADMIN` | Administrador del sistema |
-| `SUPERVISOR` | Rectoría / talento humano: última instancia de aprobación |
-| `COORDINADOR` | Coordinador académico o de área: primera instancia de aprobación |
-| `USUARIO` | Docente o personal de la institución |
+| `SUPERVISOR` | Rectoría: administra clases y usuarios, ve los reportes de toda la institución |
+| `COORDINADOR` | Coordinador académico: toma asistencia y ve los reportes de sus clases |
+| `USUARIO` | Docente: toma asistencia y ve los reportes de sus clases |
 | `ESTUDIANTE` | Estudiante matriculado: solo registra su asistencia y ve su historial |
 
 ## Tema visual

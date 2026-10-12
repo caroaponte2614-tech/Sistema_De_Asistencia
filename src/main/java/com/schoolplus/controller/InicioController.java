@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.GetMapping;
  * {@code @PreAuthorize}. Lo que se pinta son las capacidades que la matriz concede a esa
  * persona: es donde se ve, en pantalla, que el §3.1 vive en datos.</p>
  *
- * <p>Ya NO es la primera pantalla tras el login —eso es el portal (§4.7)—: se llega desde
- * el enlace "Panel" del menú lateral.</p>
+ * <p>Es la primera pantalla tras el login del personal; el estudiante aterriza en su
+ * pantalla de asistencia.</p>
  */
 @Controller
 public class InicioController {
@@ -36,7 +36,7 @@ public class InicioController {
      * Doble puerta, a propósito. SecurityConfig ya exige el ROL para llegar a la URL;
      * @PreAuthorize exige además la CAPACIDAD, que sale de la tabla rol_capacidad.
      *
-     * No es redundancia: si Talento Humano apaga una fila de la matriz, el panel deja
+     * No es redundancia: si se apaga una fila de la matriz, el panel deja
      * de abrirse sin recompilar nada. Ese es justamente el requisito del §3.1.
      */
     @GetMapping("/admin")
@@ -46,41 +46,40 @@ public class InicioController {
                 "Admin",
                 "Administración",
                 "Panel de administración",
-                "Administras usuarios, roles y el organigrama, y ves todo lo que ocurre en "
-                        + "el portal. Eres quien sube los documentos de expediente."));
+                "Administras usuarios y roles, creas las clases y ves la asistencia de toda "
+                        + "la institución."));
     }
 
-    @GetMapping("/talento-humano")
-    @PreAuthorize("@capacidades.puede('" + Capacidades.SOLICITUD_APROBAR_SEGUNDA + "')")
-    public String talentoHumano(@Actor Usuario actor, Model modelo) {
+    @GetMapping("/rectoria")
+    @PreAuthorize("@capacidades.puede('" + Capacidades.CLASE_ADMINISTRAR + "')")
+    public String rectoria(@Actor Usuario actor, Model modelo) {
         return panel(actor, modelo, new PanelRol(
-                "Supervisor",
-                "Talento Humano",
-                "Panel de Talento Humano",
-                "Eres la última instancia de aprobación: lo que el coordinador aprueba llega "
-                        + "aquí para quedar validado. También publicas en el muro y generas "
-                        + "los reportes."));
+                "Rectoría",
+                "Rectoría",
+                "Panel de rectoría",
+                "Creas las clases, matriculas a los estudiantes, administras los usuarios y "
+                        + "ves los reportes de asistencia de toda la institución."));
     }
 
     @GetMapping("/coordinacion")
-    @PreAuthorize("@capacidades.puede('" + Capacidades.SOLICITUD_APROBAR_PRIMERA + "')")
+    @PreAuthorize("@capacidades.puede('" + Capacidades.ASISTENCIA_TOMAR + "')")
     public String coordinacion(@Actor Usuario actor, Model modelo) {
         return panel(actor, modelo, new PanelRol(
                 "Coordinador",
                 "Coordinación",
                 "Panel de coordinación",
-                "Apruebas en primera instancia las solicitudes de la gente de tu área y "
-                        + "registras sus horas extras. Si deniegas, el trámite termina ahí."));
+                "Tomas asistencia en tus clases con el QR y consultas los reportes de "
+                        + "asistencia de tus grupos."));
     }
 
     @GetMapping("/mi-espacio")
     public String miEspacio(@Actor Usuario actor, Model modelo) {
         return panel(actor, modelo, new PanelRol(
-                "Colaborador",
+                "Docente",
                 "Mi espacio",
-                "Tu espacio de trabajo",
-                "Aquí llevas tu ficha, tus documentos, tus solicitudes de permisos y "
-                        + "vacaciones, y tu tablero de tareas."));
+                "Tu espacio docente",
+                "Desde aquí abres la asistencia de tus clases con el QR y consultas los "
+                        + "reportes de tus grupos."));
     }
 
     @GetMapping("/sin-permiso")

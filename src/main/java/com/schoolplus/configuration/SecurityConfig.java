@@ -112,9 +112,6 @@ public class SecurityConfig {
                                 "/favicon.ico", "/favicon.svg", "/error")
                         .permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
-                        // Verificación pública de certificados laborales: alguien escaneando
-                        // el QR de un papel impreso no tiene por qué tener sesión iniciada.
-                        .requestMatchers("/certificados/verificar/**").permitAll()
                         // Destino del QR de asistencia: quien escanea con la cámara del
                         // teléfono puede no tener sesión en ese navegador. El token se
                         // comprueba ahí mismo y, si hace falta, se le pide entrar.
@@ -124,15 +121,11 @@ public class SecurityConfig {
                         // ADMIN entra a todo lo de abajo también: es el rol que cubre a
                         // cualquier otro cuando hace falta, no solo lo suyo propio.
                         .requestMatchers("/admin/**").hasRole(Rol.ADMIN)
-                        .requestMatchers("/talento-humano/**").hasAnyRole(Rol.SUPERVISOR, Rol.ADMIN)
+                        .requestMatchers("/rectoria/**").hasAnyRole(Rol.SUPERVISOR, Rol.ADMIN)
                         .requestMatchers("/coordinacion/**").hasAnyRole(Rol.COORDINADOR, Rol.ADMIN)
-                        // El espacio personal lo tiene todo el mundo: los cuatro roles son
-                        // también colaboradores, con sus permisos y sus vacaciones.
-                        // El portal es la pestaña inicial de los cuatro (§4.7), y el
-                        // tablero es de cada quien (§4.3). Quién puede hacer QUÉ dentro lo
-                        // decide la matriz de permisos vía @PreAuthorize, no esta lista.
-                        .requestMatchers("/mi-espacio/**", "/portal/**", "/portal",
-                                "/api/v1/tablero/**", "/api/v1/notificaciones/**", "/ws/**",
+                        // El espacio personal lo tiene todo el personal. Quién puede hacer QUÉ
+                        // dentro lo decide la matriz de permisos vía @PreAuthorize, no esta lista.
+                        .requestMatchers("/mi-espacio/**", "/api/v1/notificaciones/**", "/ws/**",
                                 "/sin-permiso").authenticated()
                         // Asistencia: docentes y estudiantes. Quién entra a cada cosa lo
                         // decide la matriz (ASISTENCIA_TOMAR / ASISTENCIA_REGISTRAR), no

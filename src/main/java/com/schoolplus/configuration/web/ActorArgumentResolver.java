@@ -20,16 +20,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  * está poblado por el filtro de seguridad, y evita declarar dos parámetros
  * (uno para autenticación, otro para el actor) cuando el controlador solo necesita el
  * segundo.</p>
- *
- * <p><strong>Por qué {@code buscarActorPorEmail} y no {@code findByEmail}:</strong> la
- * resolución de argumentos de Spring MVC corre ANTES de entrar al cuerpo del método del
- * controlador, en su propia transacción corta que ya cerró para cuando el controlador se
- * ejecuta. Un {@code findByEmail} simple dejaría {@code sede}/{@code cargo}/{@code area}/
- * {@code coordinador} como proxies sin sesión: el primer controlador que tocara
- * {@code actor.getCoordinador()} directamente en su cuerpo (no dentro de un servicio con
- * su propia transacción) reventaba con {@code LazyInitializationException} — pasó de
- * verdad en {@code SolicitudController.formularioNueva}, hallazgo del 2026-09-07 al
- * introducir esta clase.</p>
  */
 @Component
 public class ActorArgumentResolver implements HandlerMethodArgumentResolver {
@@ -51,7 +41,7 @@ public class ActorArgumentResolver implements HandlerMethodArgumentResolver {
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         var autenticacion = SecurityContextHolder.getContext().getAuthentication();
         String email = autenticacion == null ? null : autenticacion.getName();
-        return usuarioRepository.buscarActorPorEmail(email)
+        return usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(String.valueOf(email)));
     }
 }

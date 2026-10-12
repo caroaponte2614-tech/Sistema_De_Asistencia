@@ -1,9 +1,7 @@
 package com.schoolplus.util;
 
 /**
- * Utilidades de texto chicas, reusadas en varios servicios y controladores que hasta
- * ahora reimplementaban lo mismo por su cuenta ({@code TableroService.limpiar},
- * {@code MuroService.vacioANulo}, {@code UsuarioAdminController.vacioANulo}).
+ * Utilidades de texto chicas, reusadas en varios servicios y controladores.
  */
 public final class Textos {
 
@@ -13,7 +11,7 @@ public final class Textos {
     /**
      * {@code null} o solo espacios se vuelve {@code null}; cualquier otra cosa, recortada.
      *
-     * <p>Para un {@code <select>} (sedeId, cargoId...) el recorte no cambia nada — esos
+     * <p>Para un {@code <select>} (horarioId...) el recorte no cambia nada — esos
      * valores nunca traen espacios de sobra. Para texto libre (título, nota, cuerpo) sí
      * importa: sin esto, un campo con solo espacios se guardaría como si tuviera
      * contenido en vez de tratarse como vacío.</p>

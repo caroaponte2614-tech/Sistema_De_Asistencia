@@ -20,8 +20,7 @@ import java.util.Map;
  * del negocio. Salen como <strong>422</strong> con el título y el mensaje que la pantalla
  * del estudiante muestra tal cual, en vez de un 500 y un texto técnico.</p>
  *
- * <p>Acotado a la API de asistencia, igual que {@code ManejadorDeConcurrencia} lo está al
- * tablero: devolver JSON desde una pantalla Thymeleaf dejaría al usuario mirando un objeto
+ * <p>Acotado a la API de asistencia: devolver JSON desde una pantalla Thymeleaf dejaría al usuario mirando un objeto
  * en crudo.</p>
  */
 @RestControllerAdvice(assignableTypes = AsistenciaApiController.class)

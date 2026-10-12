@@ -1,7 +1,7 @@
 /*
  * Lo que el resto de los scripts del shell comparten: el modal genérico y el token
  * CSRF. Se carga primero (ver app-layout.html) y expone window.SchoolPlus para que
- * shell.js, muro.js y tablero.js lo usen sin duplicar nada.
+ * shell.js y los scripts de asistencia lo usen sin duplicar nada.
  *
  * Archivo aparte y no <script> embebido: la CSP de SecurityConfig no admite scripts en
  * línea.
@@ -72,7 +72,7 @@
 
   // ── CSRF ─────────────────────────────────────────────────────────────────
   // Spring lo deja en una cookie legible (CookieCsrfTokenRepository). Compartida por
-  // la campanita y el tablero: sin este header, Spring Security rechaza el POST con
+  // la campanita y la asistencia: sin este header, Spring Security rechaza el POST con
   // 403 — y como fetch() no rechaza su promesa por códigos de error HTTP (solo por
   // fallas de red), un 403 así pasa desapercibido en silencio.
   window.SchoolPlus.csrf = function () {

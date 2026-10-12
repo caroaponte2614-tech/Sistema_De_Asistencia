@@ -26,8 +26,7 @@ import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.when;
 
 /**
- * La matriz de permisos (§3.1), que el §5.4 marca como test obligatorio junto con la
- * máquina de estados.
+ * La matriz de permisos (§3.1), que el §5.4 marca como test obligatorio.
  *
  * <p>Lo que se comprueba no es que la tabla exista, sino que <em>decide</em>: alcance,
  * precedencia entre roles acumulados y, sobre todo, que tener una capacidad no da acceso
@@ -38,7 +37,6 @@ import static org.mockito.Mockito.when;
 class CapacidadServiceTest {
 
     private static final String ID_ACTOR = "11111111-1111-1111-1111-111111111111";
-    private static final String ID_SUBORDINADO = "22222222-2222-2222-2222-222222222222";
     private static final String ID_AJENO = "33333333-3333-3333-3333-333333333333";
 
     @Mock
@@ -66,61 +64,44 @@ class CapacidadServiceTest {
 
     @Test
     void concedeLoQueLaMatrizConcede() {
-        conceder(new CapacidadConcedida(Capacidades.SOLICITUD_APROBAR_PRIMERA, "Aprobar", "SOLICITUDES", Ambito.AREA));
+        conceder(new CapacidadConcedida(Capacidades.ASISTENCIA_TOMAR, "Tomar asistencia", "ASISTENCIA", Ambito.PROPIO));
 
-        assertThat(capacidades.puede(Capacidades.SOLICITUD_APROBAR_PRIMERA)).isTrue();
-        assertThat(capacidades.ambitoDe(Capacidades.SOLICITUD_APROBAR_PRIMERA)).contains(Ambito.AREA);
+        assertThat(capacidades.puede(Capacidades.ASISTENCIA_TOMAR)).isTrue();
+        assertThat(capacidades.ambitoDe(Capacidades.ASISTENCIA_TOMAR)).contains(Ambito.PROPIO);
     }
 
     @Test
     void niegaLoQueNoEsta() {
-        conceder(new CapacidadConcedida(Capacidades.SOLICITUD_CREAR, "Crear", "SOLICITUDES", Ambito.PROPIO));
+        conceder(new CapacidadConcedida(Capacidades.ASISTENCIA_TOMAR, "Tomar asistencia", "ASISTENCIA", Ambito.PROPIO));
 
         // Una fila apagada por pendiente_confirmacion no la devuelve la consulta, así
         // que aquí se ve exactamente igual que si no existiera: negada.
-        assertThat(capacidades.puede(Capacidades.REPORTE_GENERAR)).isFalse();
-        assertThat(capacidades.ambitoDe(Capacidades.REPORTE_GENERAR)).isEmpty();
+        assertThat(capacidades.puede(Capacidades.CLASE_ADMINISTRAR)).isFalse();
+        assertThat(capacidades.ambitoDe(Capacidades.CLASE_ADMINISTRAR)).isEmpty();
     }
 
     @Test
     void quienAcumulaRolesSeQuedaConElAmbitoMayor() {
         conceder(
-                new CapacidadConcedida(Capacidades.TABLERO_VER, "Ver tableros", "TABLERO", Ambito.AREA),
-                new CapacidadConcedida(Capacidades.TABLERO_VER, "Ver tableros", "TABLERO", Ambito.TODOS));
+                new CapacidadConcedida(Capacidades.ASISTENCIA_REPORTE, "Ver reportes", "ASISTENCIA", Ambito.PROPIO),
+                new CapacidadConcedida(Capacidades.ASISTENCIA_REPORTE, "Ver reportes", "ASISTENCIA", Ambito.TODOS));
 
-        assertThat(capacidades.ambitoDe(Capacidades.TABLERO_VER)).contains(Ambito.TODOS);
+        assertThat(capacidades.ambitoDe(Capacidades.ASISTENCIA_REPORTE)).contains(Ambito.TODOS);
     }
 
     @Test
     void elAmbitoPropioNoAlcanzaAOtraPersona() {
-        conceder(new CapacidadConcedida(Capacidades.DOCUMENTO_RESTRINGIDO_VER, "Ver", "DOCUMENTOS", Ambito.PROPIO));
+        conceder(new CapacidadConcedida(Capacidades.ASISTENCIA_REPORTE, "Ver reportes", "ASISTENCIA", Ambito.PROPIO));
 
-        assertThat(capacidades.puedeSobre(Capacidades.DOCUMENTO_RESTRINGIDO_VER, ID_ACTOR)).isTrue();
-        assertThat(capacidades.puedeSobre(Capacidades.DOCUMENTO_RESTRINGIDO_VER, ID_AJENO)).isFalse();
-    }
-
-    @Test
-    void elAmbitoAreaSoloAlcanzaAQuienMeTieneDeCoordinador() {
-        conceder(new CapacidadConcedida(Capacidades.HORAS_EXTRA_REGISTRAR, "Horas extra", "HORAS_EXTRA", Ambito.AREA));
-
-        Usuario subordinado = usuario(ID_SUBORDINADO, "colaborador@schoolplus.example", Rol.USUARIO);
-        subordinado.setCoordinador(usuario(ID_ACTOR, "coordinador@schoolplus.example", Rol.COORDINADOR));
-        when(usuarioRepository.findById(ID_SUBORDINADO)).thenReturn(Optional.of(subordinado));
-
-        // Mismo rol, pero cuelga de otro coordinador: fuera de alcance.
-        Usuario ajeno = usuario(ID_AJENO, "otro@schoolplus.example", Rol.USUARIO);
-        ajeno.setCoordinador(usuario("99999999-9999-9999-9999-999999999999", "jefa@schoolplus.example", Rol.COORDINADOR));
-        when(usuarioRepository.findById(ID_AJENO)).thenReturn(Optional.of(ajeno));
-
-        assertThat(capacidades.puedeSobre(Capacidades.HORAS_EXTRA_REGISTRAR, ID_SUBORDINADO)).isTrue();
-        assertThat(capacidades.puedeSobre(Capacidades.HORAS_EXTRA_REGISTRAR, ID_AJENO)).isFalse();
+        assertThat(capacidades.puedeSobre(Capacidades.ASISTENCIA_REPORTE, ID_ACTOR)).isTrue();
+        assertThat(capacidades.puedeSobre(Capacidades.ASISTENCIA_REPORTE, ID_AJENO)).isFalse();
     }
 
     @Test
     void elAmbitoTodosAlcanzaACualquiera() {
-        conceder(new CapacidadConcedida(Capacidades.DOCUMENTO_RESTRINGIDO_SUBIR, "Subir", "DOCUMENTOS", Ambito.TODOS));
+        conceder(new CapacidadConcedida(Capacidades.ASISTENCIA_REPORTE, "Ver reportes", "ASISTENCIA", Ambito.TODOS));
 
-        assertThat(capacidades.puedeSobre(Capacidades.DOCUMENTO_RESTRINGIDO_SUBIR, ID_AJENO)).isTrue();
+        assertThat(capacidades.puedeSobre(Capacidades.ASISTENCIA_REPORTE, ID_AJENO)).isTrue();
     }
 
     @Test

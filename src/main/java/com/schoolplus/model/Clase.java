@@ -16,9 +16,8 @@ import java.time.LocalDateTime;
 /**
  * Una clase: una asignatura dictada por un docente a un grupo, en un periodo.
  *
- * <p>No se confunde con {@link Curso}, que es una capacitación del personal (video más
- * quiz). Lo escolar y lo laboral conviven sin mezclarse: el docente es un {@link Usuario}
- * con sus permisos y sus vacaciones, y además es el profesor de estas clases.</p>
+ * <p>El docente es un {@link Usuario} con el rol que le corresponde, y es el profesor de
+ * estas clases.</p>
  *
  * <p>El profesor es quien puede abrir y cerrar sus sesiones de asistencia; la matriz de
  * permisos lo expresa con el ámbito PROPIO de {@code ASISTENCIA_TOMAR}.</p>

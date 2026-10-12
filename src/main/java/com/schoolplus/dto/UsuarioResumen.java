@@ -3,9 +3,8 @@ package com.schoolplus.dto;
 /**
  * Datos del usuario que pinta el panel.
  *
- * <p>Es un DTO y no la entidad porque {@code open-in-view} está apagado: la sede y el cargo
- * se resuelven dentro de la transacción y llegan a la plantilla ya como texto. Además, de
- * este modo el hash de la contraseña nunca entra al modelo de la vista.</p>
+ * <p>Es un DTO y no la entidad para que el hash de la contraseña nunca entre al modelo de
+ * la vista. {@code roles} llega ya como texto ("Docente, Rectoría").</p>
  */
-public record UsuarioResumen(String nombre, String email, String sede, String cargo) {
+public record UsuarioResumen(String nombre, String email, String roles) {
 }

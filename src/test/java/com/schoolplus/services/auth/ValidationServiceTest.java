@@ -80,25 +80,12 @@ class ValidationServiceTest {
                 .anyMatch(error -> error.contains("3 y 110 letras"));
     }
 
-    @Test
-    void exigeSedeYCargo() {
-        RegistroForm form = formValido();
-        form.setSedeId(null);
-        form.setCargoId("  ");
-
-        assertThat(validation.validarRegistro(form))
-                .anyMatch(error -> error.contains("sede"))
-                .anyMatch(error -> error.contains("cargo"));
-    }
-
     private RegistroForm formValido() {
         RegistroForm form = new RegistroForm();
         form.setNombre("Ana Gómez");
         form.setEmail("ana.gomez@schoolplus.example");
         form.setCedula("1020304050");
         form.setTelefono("3001234567");
-        form.setSedeId("11111111-1111-1111-1111-111111111111");
-        form.setCargoId("22222222-2222-2222-2222-222222222222");
         form.setPassword("Alameda2026");
         form.setConfirmPassword("Alameda2026");
         return form;
