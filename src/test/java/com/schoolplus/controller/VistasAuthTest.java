@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 /**
  * Las tres vistas públicas de autenticación: que salen sin sesión, que llevan el diseño del
@@ -48,8 +49,7 @@ import static org.hamcrest.Matchers.containsString;
         SecurityFilterAutoConfiguration.class
 })
 @TestPropertySource(properties = {
-        "app.security.remember-me.key=clave-solo-para-el-test",
-        "app.version=9.9.9"
+        "app.security.remember-me.key=clave-solo-para-el-test"
 })
 class VistasAuthTest {
 
@@ -84,9 +84,9 @@ class VistasAuthTest {
     void elLoginEsPublicoYUsaElDisenoDelPrototipo() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                // Titular y texto del prototipo los prototipos de diseño (login).
                 .andExpect(content().string(containsString("Ingresa a tu cuenta")))
-                .andExpect(content().string(containsString("en un solo lugar")))
+                // Tarjeta centrada, sin el panel lateral de marca que tenía antes.
+                .andExpect(content().string(not(containsString("en un solo lugar"))))
                 // Tokens del sistema Modernist, no los del dashboard índigo.
                 .andExpect(content().string(containsString("var(--color-accent)")))
                 .andExpect(content().string(containsString("family=Archivo")))

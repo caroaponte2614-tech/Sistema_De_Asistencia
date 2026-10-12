@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <!--
   Inicio de sesión.
-  Origen del diseño: los prototipos de diseño (login/Login.dc.html) (columna derecha).
   El formulario apunta a /login, con los nombres de campo que espera SecurityConfig
   (email / password), heredados de un proyecto de referencia.
 -->
@@ -38,7 +37,7 @@
 
     <form th:action="@{/login}" method="post" class="flex flex-col gap-[22px]" data-formulario-auth>
         <div class="flex flex-col gap-2">
-            <label for="email" class="etiqueta-campo">Correo corporativo</label>
+            <label for="email" class="etiqueta-campo">Correo institucional</label>
             <input id="email" name="email" type="email" required autofocus
                    placeholder="nombre.apellido@schoolplus.example" autocomplete="username"
                    th:value="${param.email}"

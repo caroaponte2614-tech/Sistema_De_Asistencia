@@ -35,8 +35,6 @@ public interface ClaseRepository extends JpaRepository<Clase, String> {
             """)
     List<Clase> activasConProfesor();
 
-    long countByActivaTrue();
-
     @Query("""
             select c from Clase c
             join fetch c.profesor

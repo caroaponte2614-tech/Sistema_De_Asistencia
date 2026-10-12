@@ -3,16 +3,11 @@
   Marco compartido por TODAS las vistas de autenticación: login, registro,
   recuperación y restablecimiento de contraseña.
 
-  Origen: los prototipos de diseño (login/Login.dc.html) — se porta la composición
-  completa (panel izquierdo con la marca y el titular, columna derecha con el
-  formulario, tira superior y pie). Cambios respecto al prototipo:
+  Una tarjeta centrada en la pantalla, sin panel lateral: la marca, el formulario y
+  debajo los enlaces de ayuda.
 
-    · Las tres cifras del panel salen de la base de datos, no son texto fijo.
-      El prototipo traía "4.820 / 36 / v4.2" como marcador de posición.
-    · Nada de style="" en línea ni de <script> embebido: la CSP declarada en
-      SecurityConfig prohíbe ambos. El color del panel pasa a una clase Tailwind
-      y el JS vive en /js/auth.js.
-    · Rejilla de una sola columna por debajo de lg; el panel se oculta.
+  Nada de style="" en línea ni de <script> embebido: la CSP declarada en
+  SecurityConfig prohíbe ambos. El JS vive en /js/auth.js.
 -->
 <html th:fragment="pagina(titulo, contenido)" lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -28,67 +23,27 @@
 </head>
 <body class="m-0 min-h-screen bg-[var(--color-bg)] font-[var(--font-body)] text-[var(--color-text)] antialiased">
 
-<div class="grid min-h-screen grid-cols-1 lg:grid-cols-[1.05fr_1fr]">
+<main class="flex min-h-screen flex-col items-center justify-center px-4 py-10">
+    <div class="w-full max-w-[480px]">
 
-    <!-- ── Panel de marca ─────────────────────────────────────────────────── -->
-    <aside class="relative hidden flex-col justify-between overflow-hidden border-r border-[var(--color-divider)] bg-[var(--color-accent-200)] px-14 pt-14 pb-10 lg:flex">
-        <div class="panel-marca-rejilla pointer-events-none absolute inset-0"></div>
-
-        <div class="relative flex items-baseline gap-3">
-            <div class="h-3.5 w-3.5 shrink-0 bg-[var(--color-accent)]"></div>
+        <a th:href="@{/}" class="mb-6 flex items-center justify-center gap-3 no-underline hover:no-underline">
+            <span class="h-3.5 w-3.5 shrink-0 bg-[var(--color-accent)]"></span>
             <span class="font-[var(--font-heading)] text-[15px] font-extrabold uppercase tracking-[0.16em] text-[var(--color-accent-800)]">School_Plus</span>
-        </div>
+        </a>
 
-        <div class="relative flex max-w-[460px] flex-col gap-7">
-            <h1 class="m-0 text-[68px] leading-[0.98] tracking-[-0.03em] text-balance text-[var(--color-accent-900)]">
-                Tu colegio,<br><em class="font-light italic">en un solo lugar</em>
-            </h1>
-            <div class="h-0.5 w-24 bg-[var(--color-accent-700)]"></div>
-            <p class="m-0 max-w-[40ch] text-[17px] leading-[1.55] text-[var(--color-accent-800)]">
-                Clases y asistencia con QR para docentes y estudiantes.
-            </p>
-        </div>
-
-        <div class="relative grid grid-cols-3 gap-4 border-t border-[var(--color-accent-700)] pt-4">
-            <div class="flex flex-col gap-0.5">
-                <span class="font-[var(--font-heading)] text-[22px] font-extrabold text-[var(--color-accent-900)]"
-                      th:text="${#numbers.formatInteger(portadaUsuarios, 1, 'POINT')}">0</span>
-                <span class="text-[11px] uppercase tracking-[0.1em] text-[var(--color-accent-700)]">Usuarios</span>
-            </div>
-            <div class="flex flex-col gap-0.5">
-                <span class="font-[var(--font-heading)] text-[22px] font-extrabold text-[var(--color-accent-900)]"
-                      th:text="${portadaClases}">0</span>
-                <span class="text-[11px] uppercase tracking-[0.1em] text-[var(--color-accent-700)]">Clases</span>
-            </div>
-            <div class="flex flex-col gap-0.5">
-                <span class="font-[var(--font-heading)] text-[22px] font-extrabold text-[var(--color-accent-900)]"
-                      th:text="'v' + ${portadaVersion}">v0</span>
-                <span class="text-[11px] uppercase tracking-[0.1em] text-[var(--color-accent-700)]">Plataforma</span>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ── Columna del formulario ─────────────────────────────────────────── -->
-    <main class="flex flex-col gap-10 px-6 py-10 sm:px-10 lg:pl-14 lg:pr-16">
-
-        <div class="flex items-center justify-between text-[12px] uppercase tracking-[0.08em] text-[var(--color-neutral-600)]">
-            <span>Plataforma escolar</span>
-            <a th:href="@{/}" class="lg:hidden">School_Plus</a>
-        </div>
-
-        <div class="flex w-full max-w-[460px] flex-1 flex-col justify-center">
+        <div class="card-strong flex flex-col px-6 py-8 sm:px-10 sm:py-10">
             <th:block th:replace="${contenido}"/>
         </div>
 
-        <div class="flex flex-col gap-2 border-t border-[var(--color-divider)] pt-4 text-[12px] text-[var(--color-neutral-600)] sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div class="mt-6 flex flex-col items-center gap-2 text-center text-[12px] text-[var(--color-neutral-600)]">
             <span>¿Sin acceso? Escribe a soporte@schoolplus.example</span>
             <span class="flex gap-[18px]">
                 <a th:href="@{/}">Inicio</a>
                 <a th:href="@{/recuperar}">Recuperar contraseña</a>
             </span>
         </div>
-    </main>
-</div>
+    </div>
+</main>
 
 <script th:src="@{/js/auth.js}" defer></script>
 </body>

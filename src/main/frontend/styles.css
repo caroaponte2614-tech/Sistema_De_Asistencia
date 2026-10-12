@@ -420,13 +420,6 @@
   /* — utilidades del sistema — */
   .grayscale-ds { filter: grayscale(1) contrast(1.08); }
 
-  /* Fondo del panel de marca del login: rejilla fina sobre el primario claro. */
-  .panel-marca-rejilla {
-    background-color: var(--color-accent-100);
-    background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 12%, transparent) 1px, transparent 1px);
-    background-size: 25% 100%;
-  }
-
   /* Velo detrás del menú lateral en pantallas chicas. */
   .overlay-menu { background: color-mix(in srgb, var(--color-neutral-900) 45%, transparent); }
 }
