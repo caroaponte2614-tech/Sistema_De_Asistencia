@@ -41,4 +41,12 @@ public interface ClaseInscripcionRepository extends JpaRepository<ClaseInscripci
      * a aprobarle un cambio de celular: sobre sus estudiantes sí, sobre los demás no.
      */
     boolean existsByEstudianteIdAndClaseProfesorIdAndActivaTrue(String estudianteId, String profesorId);
+
+    /** Los profesores de un estudiante, sin repetir: a quiénes avisar de un cambio de celular. */
+    @Query("""
+            select distinct c.profesor.id from ClaseInscripcion i
+            join i.clase c
+            where i.estudiante.id = :estudianteId and i.activa = true and c.activa = true
+            """)
+    List<String> profesoresDe(@Param("estudianteId") String estudianteId);
 }

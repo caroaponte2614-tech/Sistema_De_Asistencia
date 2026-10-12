@@ -43,15 +43,18 @@ public class DispositivoService {
     private final AsistenciaDispositivoRepository dispositivoRepository;
     private final ClaseInscripcionRepository inscripcionRepository;
     private final CapacidadService capacidades;
+    private final NotificadorAsistencia notificador;
     private final Clock reloj;
 
     public DispositivoService(AsistenciaDispositivoRepository dispositivoRepository,
                               ClaseInscripcionRepository inscripcionRepository,
                               CapacidadService capacidades,
+                              NotificadorAsistencia notificador,
                               Clock reloj) {
         this.dispositivoRepository = dispositivoRepository;
         this.inscripcionRepository = inscripcionRepository;
         this.capacidades = capacidades;
+        this.notificador = notificador;
         this.reloj = reloj;
     }
 
@@ -62,8 +65,11 @@ public class DispositivoService {
      * <p>Si el teléfono es nuevo y la persona todavía no tenía ninguno, queda vinculado en
      * el acto: pedir una aprobación para el primer registro de cada estudiante sería una
      * fila de cien personas el primer día.</p>
+     *
+     * <p>El rechazo por celular nuevo deja guardada la solicitud de cambio: por eso
+     * {@link RegistroRechazadoException} no deshace la transacción.</p>
      */
-    @Transactional
+    @Transactional(noRollbackFor = RegistroRechazadoException.class)
     public AsistenciaDispositivo autorizarParaRegistro(Usuario estudiante, String identificadorCrudo,
                                                        String userAgent) {
         if (identificadorCrudo == null || identificadorCrudo.isBlank()) {
@@ -131,7 +137,9 @@ public class DispositivoService {
         solicitud.setResueltoEn(ahora);
         log.info("Cambio de celular aprobado para {} por {}",
                 solicitud.getEstudiante().getEmail(), actor.getEmail());
-        return dispositivoRepository.save(solicitud);
+        AsistenciaDispositivo aprobada = dispositivoRepository.save(solicitud);
+        notificador.cambioDeCelularAprobado(aprobada);
+        return aprobada;
     }
 
     @Transactional
@@ -142,7 +150,9 @@ public class DispositivoService {
             throw new IllegalArgumentException("Esa solicitud ya fue resuelta.");
         }
         solicitud.desactivar(EstadoDispositivo.RECHAZADO, actor, LocalDateTime.now(reloj));
-        return dispositivoRepository.save(solicitud);
+        AsistenciaDispositivo rechazada = dispositivoRepository.save(solicitud);
+        notificador.cambioDeCelularRechazado(rechazada);
+        return rechazada;
     }
 
     /**
@@ -156,6 +166,7 @@ public class DispositivoService {
         dispositivo.desactivar(EstadoDispositivo.REVOCADO, actor, LocalDateTime.now(reloj));
         dispositivoRepository.save(dispositivo);
         log.info("Celular de {} desvinculado por {}", dispositivo.getEstudiante().getEmail(), actor.getEmail());
+        notificador.celularDesvinculado(dispositivo);
     }
 
     @Transactional(readOnly = true)
@@ -173,8 +184,9 @@ public class DispositivoService {
         if (yaPedido) {
             return;
         }
-        dispositivoRepository.save(nuevo(estudiante, hash, userAgent));
+        AsistenciaDispositivo solicitud = dispositivoRepository.save(nuevo(estudiante, hash, userAgent));
         log.info("Solicitud de cambio de celular registrada para {}", estudiante.getEmail());
+        notificador.cambioDeCelularPedido(estudiante, solicitud);
     }
 
     private AsistenciaDispositivo nuevo(Usuario estudiante, String hash, String userAgent) {

@@ -47,6 +47,8 @@ class DispositivoServiceTest {
     private ClaseInscripcionRepository inscripcionRepository;
     @Mock
     private CapacidadService capacidades;
+    @Mock
+    private NotificadorAsistencia notificador;
 
     private DispositivoService servicio;
     private Usuario ana;
@@ -56,7 +58,7 @@ class DispositivoServiceTest {
     @BeforeEach
     void preparar() {
         servicio = new DispositivoService(dispositivoRepository, inscripcionRepository, capacidades,
-                Clock.fixed(AHORA, ZoneOffset.UTC));
+                notificador, Clock.fixed(AHORA, ZoneOffset.UTC));
 
         ana = usuario("est-ana", "ana@schoolplus.example");
         luis = usuario("est-luis", "luis@schoolplus.example");
@@ -110,6 +112,8 @@ class DispositivoServiceTest {
         verify(dispositivoRepository).save(guardado.capture());
         assertThat(guardado.getValue().getEstado()).isEqualTo(EstadoDispositivo.PENDIENTE);
         assertThat(guardado.getValue().getDescripcion()).isEqualTo("iPhone/iPad · Safari");
+        // Sin aviso, la solicitud esperaría en una lista que nadie está mirando.
+        verify(notificador).cambioDeCelularPedido(ana, guardado.getValue());
     }
 
     @Test
@@ -123,6 +127,7 @@ class DispositivoServiceTest {
                 .isInstanceOf(RegistroRechazadoException.class);
 
         verify(dispositivoRepository, never()).save(any());
+        verify(notificador, never()).cambioDeCelularPedido(any(), any());
     }
 
     @Test
@@ -167,6 +172,7 @@ class DispositivoServiceTest {
         assertThat(anterior.getEstado()).isEqualTo(EstadoDispositivo.REEMPLAZADO);
         assertThat(anterior.getActivoEstudianteId()).isNull();
         assertThat(anterior.getActivoIdentificador()).isNull();
+        verify(notificador).cambioDeCelularAprobado(aprobado);
     }
 
     @Test
@@ -180,6 +186,7 @@ class DispositivoServiceTest {
         assertThatThrownBy(() -> servicio.aprobarCambio(profesor, "disp-nuevo"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("no está en ninguna de tus clases");
+        verify(notificador, never()).cambioDeCelularAprobado(any());
     }
 
     @Test
@@ -203,6 +210,30 @@ class DispositivoServiceTest {
 
         assertThatThrownBy(() -> servicio.aprobarCambio(profesor, "disp-nuevo"))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void alRechazarSeLeAvisaAlEstudiante() {
+        AsistenciaDispositivo solicitud = pendienteDe(ana, OTRO_CELULAR);
+        when(dispositivoRepository.buscarConEstudiante("disp-nuevo")).thenReturn(Optional.of(solicitud));
+        when(capacidades.ambitoDe(Capacidades.ASISTENCIA_TOMAR)).thenReturn(Optional.of(Ambito.TODOS));
+
+        AsistenciaDispositivo rechazada = servicio.rechazarCambio(profesor, "disp-nuevo");
+
+        assertThat(rechazada.getEstado()).isEqualTo(EstadoDispositivo.RECHAZADO);
+        verify(notificador).cambioDeCelularRechazado(rechazada);
+    }
+
+    @Test
+    void alDesvincularSeLeAvisaAlEstudiante() {
+        AsistenciaDispositivo activo = activoDe(ana, CELULAR);
+        when(dispositivoRepository.buscarConEstudiante("disp-activo")).thenReturn(Optional.of(activo));
+        when(capacidades.ambitoDe(Capacidades.ASISTENCIA_TOMAR)).thenReturn(Optional.of(Ambito.TODOS));
+
+        servicio.desvincular(profesor, "disp-activo");
+
+        assertThat(activo.getEstado()).isEqualTo(EstadoDispositivo.REVOCADO);
+        verify(notificador).celularDesvinculado(activo);
     }
 
     // ── Ayudas ───────────────────────────────────────────────────────────────

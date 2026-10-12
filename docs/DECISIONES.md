@@ -224,3 +224,16 @@ asistencia.
   pantalla de asistencia.
 - Quedan sin efecto D-013, D-015, D-016, D-017 (documentos), D-019, D-020 (el 409 de
   los tableros), D-021, D-023, D-025 (muro), D-030 y D-032.
+
+## D-037 · La campanita avisa de los cambios de celular
+**Estado:** decidido por el usuario (2026-10-12).
+
+Tras D-036 la campanita no tenía quién la usara. Ahora la alimenta la vinculación de
+celulares (`NotificadorAsistencia`): la solicitud de cambio llega a cada profesor del
+estudiante, y la aprobación, el rechazo o la desvinculación le llegan al estudiante.
+
+- **Arreglo de paso:** la solicitud de cambio se guardaba justo antes de lanzar
+  `RegistroRechazadoException`, y esa excepción deshacía la transacción, así que la
+  solicitud nunca quedaba en la base. Los métodos de registro ahora usan
+  `noRollbackFor = RegistroRechazadoException.class`. Es seguro porque todos los demás
+  rechazos se lanzan antes de escribir nada; una comprobación nueva tiene que respetarlo.

@@ -249,7 +249,7 @@ public class AsistenciaService {
     // ── Estudiante: registrarse ──────────────────────────────────────────────
 
     /** Registro por QR: el token lo acaba de leer la cámara. */
-    @Transactional
+    @Transactional(noRollbackFor = RegistroRechazadoException.class)
     public AsistenciaRegistro registrarConToken(Usuario estudiante, String token, ContextoRegistro contexto) {
         TokenAsistenciaService.Verificacion verificacion = tokens.verificar(token);
         return switch (verificacion.estado()) {
@@ -266,7 +266,7 @@ public class AsistenciaService {
      * las clases de ese estudiante, que son una o dos. Así el estudiante no tiene que
      * elegir clase en una lista.</p>
      */
-    @Transactional
+    @Transactional(noRollbackFor = RegistroRechazadoException.class)
     public AsistenciaRegistro registrarConCodigo(Usuario estudiante, String codigo, ContextoRegistro contexto) {
         String limpio = codigo == null ? "" : codigo.replaceAll("\\D", "");
         if (limpio.length() != 6) {
@@ -286,7 +286,7 @@ public class AsistenciaService {
      * el token ahí mismo y, si hace falta iniciar sesión o conceder la ubicación, el
      * escaneo espera unos segundos ({@link ReglasAsistencia#segundosParaConfirmar()}).</p>
      */
-    @Transactional
+    @Transactional(noRollbackFor = RegistroRechazadoException.class)
     public AsistenciaRegistro registrarEscaneoPendiente(Usuario estudiante, String sesionId,
                                                         LocalDateTime escaneadoEn, ContextoRegistro contexto) {
         if (sesionId == null || escaneadoEn == null) {
@@ -305,6 +305,11 @@ public class AsistenciaService {
      * <p>Primero lo que depende de la sesión y de la matrícula, y solo después el celular:
      * así un intento de alguien que ni siquiera está en la clase no le vincula un teléfono
      * a nadie.</p>
+     *
+     * <p>Cada rechazo se lanza antes de escribir nada, salvo el de celular nuevo, que deja
+     * guardada la solicitud de cambio y el aviso a los profesores. Por eso los métodos que
+     * llegan aquí no deshacen la transacción ante {@link RegistroRechazadoException}: una
+     * comprobación nueva tiene que respetar ese orden.</p>
      */
     private AsistenciaRegistro registrar(Usuario estudiante, String sesionId, MetodoAsistencia metodo,
                                          ContextoRegistro contexto) {

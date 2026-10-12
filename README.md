@@ -151,7 +151,7 @@ y sus estudiantes matriculados (`/rectoria/clases`).
 | QR dinámico | El QR lleva un token firmado con HMAC-SHA256 (sesión + ventana de tiempo). Rota cada 15 s y se acepta una ventana de gracia: vale entre 15 y 30 segundos |
 | Código rotativo | Los 6 dígitos se derivan del mismo HMAC y cambian al mismo ritmo |
 | Solo con la sesión abierta | Un token de una sesión cerrada no registra nada |
-| Celular vinculado | El primer registro vincula el teléfono a la cuenta. Desde otro, el registro se rechaza y queda una solicitud que un profesor de ese estudiante (o un admin) debe autorizar |
+| Celular vinculado | El primer registro vincula el teléfono a la cuenta. Desde otro, el registro se rechaza y queda una solicitud que un profesor de ese estudiante (o un admin) debe autorizar. A sus profesores les llega el aviso en la campanita, y al estudiante cuando se decide |
 | Un celular, una persona | Restricciones únicas en la base: un celular activo por estudiante, y un mismo celular no registra a dos personas en la misma sesión |
 | Un registro por sesión | Restricción única `(sesion_id, estudiante_id)` |
 | Auditoría | Cada registro guarda método, celular, IP, user agent y, si se activa, coordenadas |
