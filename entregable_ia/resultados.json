@@ -1,0 +1,601 @@
+{
+ "eda": {
+  "filas": 115891,
+  "columnas": 11,
+  "estudiantes": 480,
+  "clases": 60,
+  "duplicados": 691,
+  "nulos": {
+   "observacion": 98.3,
+   "dispositivo_id": 20.9,
+   "ip": 20.9,
+   "estado": 0.0
+  },
+  "estados": {
+   "PRESENTE": 80.2,
+   "AUSENTE": 11.9,
+   "TARDE": 6.3,
+   "JUSTIFICADO": 1.7
+  },
+  "metodos": {
+   "QR": 68.1,
+   "CIERRE": 13.6,
+   "CODIGO": 11.0,
+   "MANUAL": 7.3
+  }
+ },
+ "limpieza": {
+  "eliminados": 691,
+  "final": 115200
+ },
+ "stats": {
+  "pct_medio": 90.0,
+  "pct_mediana": 91.6,
+  "pct_p10": 80.5,
+  "tardanza_media": 7.5,
+  "prevalencia_riesgo": 21.7,
+  "n_riesgo": 104,
+  "corr_pct_y": -0.39,
+  "corr_tend_y": -0.32,
+  "corr_tard_y": 0.58,
+  "corr_cel_y": 0.27,
+  "pct_sin_cel": 9.2,
+  "aus_sin_cel": 18.6,
+  "aus_con_cel": 11.5,
+  "riesgo_sin_cel": 25.0,
+  "riesgo_con_cel": 21.3,
+  "riesgo_manana": 21.2,
+  "riesgo_tarde": 22.1
+ },
+ "cv": {
+  "Regresión logística": {
+   "auc_media": 0.916,
+   "auc_std": 0.031
+  },
+  "Random Forest": {
+   "auc_media": 0.919,
+   "auc_std": 0.015
+  }
+ },
+ "test": {
+  "Regresión logística": {
+   "precision": 0.59,
+   "recall": 0.742,
+   "f1": 0.657,
+   "accuracy": 0.833,
+   "auc": 0.905,
+   "tp": 23,
+   "fp": 16,
+   "fn": 8,
+   "tn": 97
+  },
+  "Random Forest": {
+   "precision": 0.519,
+   "recall": 0.871,
+   "f1": 0.651,
+   "accuracy": 0.799,
+   "auc": 0.897,
+   "tp": 27,
+   "fp": 25,
+   "fn": 4,
+   "tn": 88
+  },
+  "Regla manual (coordinación)": {
+   "precision": 0.457,
+   "recall": 0.516,
+   "f1": 0.485,
+   "accuracy": 0.764,
+   "tp": 16,
+   "fp": 19,
+   "fn": 15,
+   "tn": 94
+  }
+ },
+ "elegido": "Random Forest",
+ "importancia": {
+  "pct_tardanza": 0.509,
+  "variabilidad_semanal": 0.103,
+  "pct_asistencia": 0.097,
+  "tendencia_semanal": 0.094,
+  "ausencias_ult2sem": 0.084,
+  "pct_lunes_viernes_aus": 0.039,
+  "cambios_celular": 0.029,
+  "justificadas": 0.028,
+  "racha_max_ausencias": 0.017
+ },
+ "coef_lr": {
+  "pct_asistencia": -0.76,
+  "pct_tardanza": 1.75,
+  "ausencias_ult2sem": -0.26,
+  "racha_max_ausencias": 0.17,
+  "tendencia_semanal": -0.38,
+  "variabilidad_semanal": 0.08,
+  "justificadas": 0.23,
+  "pct_lunes_viernes_aus": 0.27,
+  "cambios_celular": 0.35
+ },
+ "equidad": {
+  "Con celular": {
+   "n": 128,
+   "recall": 0.92,
+   "fpr": 0.2,
+   "tasa_alerta": 0.34
+  },
+  "Sin celular": {
+   "n": 16,
+   "recall": 0.6,
+   "fpr": 0.45,
+   "tasa_alerta": 0.5
+  },
+  "Mañana": {
+   "n": 78,
+   "recall": 1.0,
+   "fpr": 0.18,
+   "tasa_alerta": 0.35
+  },
+  "Tarde": {
+   "n": 66,
+   "recall": 0.73,
+   "fpr": 0.27,
+   "tasa_alerta": 0.38
+  }
+ },
+ "manual": {
+  "aciertos": 22,
+  "n": 25
+ },
+ "manual_casos": [
+  {
+   "id": "E0447",
+   "pct": 95.0,
+   "tend": -0.16,
+   "racha": 2,
+   "aus2": 1,
+   "prob": 0.02,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 96.7,
+   "sin_cel": false
+  },
+  {
+   "id": "E0176",
+   "pct": 94.4,
+   "tend": 0.79,
+   "racha": 1,
+   "aus2": 0,
+   "prob": 0.05,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 97.5,
+   "sin_cel": false
+  },
+  {
+   "id": "E0137",
+   "pct": 87.3,
+   "tend": 0.05,
+   "racha": 2,
+   "aus2": 5,
+   "prob": 0.13,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 88.3,
+   "sin_cel": false
+  },
+  {
+   "id": "E0262",
+   "pct": 85.7,
+   "tend": 1.09,
+   "racha": 2,
+   "aus2": 4,
+   "prob": 0.62,
+   "pred": 1,
+   "real": 1,
+   "real_pct": 48.7,
+   "sin_cel": false
+  },
+  {
+   "id": "E0302",
+   "pct": 80.8,
+   "tend": -0.87,
+   "racha": 3,
+   "aus2": 9,
+   "prob": 0.51,
+   "pred": 1,
+   "real": 0,
+   "real_pct": 80.0,
+   "sin_cel": true
+  },
+  {
+   "id": "E0396",
+   "pct": 95.8,
+   "tend": -0.4,
+   "racha": 1,
+   "aus2": 2,
+   "prob": 0.71,
+   "pred": 1,
+   "real": 0,
+   "real_pct": 83.1,
+   "sin_cel": false
+  },
+  {
+   "id": "E0251",
+   "pct": 98.1,
+   "tend": 0.95,
+   "racha": 1,
+   "aus2": 0,
+   "prob": 0.05,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 97.5,
+   "sin_cel": false
+  },
+  {
+   "id": "E0161",
+   "pct": 92.4,
+   "tend": 1.96,
+   "racha": 1,
+   "aus2": 1,
+   "prob": 0.03,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 91.6,
+   "sin_cel": false
+  },
+  {
+   "id": "E0420",
+   "pct": 90.0,
+   "tend": 0.16,
+   "racha": 1,
+   "aus2": 2,
+   "prob": 0.14,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 95.8,
+   "sin_cel": true
+  },
+  {
+   "id": "E0084",
+   "pct": 81.0,
+   "tend": 1.05,
+   "racha": 2,
+   "aus2": 4,
+   "prob": 0.44,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 84.2,
+   "sin_cel": true
+  },
+  {
+   "id": "E0034",
+   "pct": 67.2,
+   "tend": -7.88,
+   "racha": 6,
+   "aus2": 18,
+   "prob": 1.0,
+   "pred": 1,
+   "real": 1,
+   "real_pct": 43.3,
+   "sin_cel": false
+  },
+  {
+   "id": "E0052",
+   "pct": 95.0,
+   "tend": -0.79,
+   "racha": 1,
+   "aus2": 2,
+   "prob": 0.02,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 96.6,
+   "sin_cel": false
+  },
+  {
+   "id": "E0210",
+   "pct": 78.2,
+   "tend": -2.04,
+   "racha": 2,
+   "aus2": 6,
+   "prob": 0.57,
+   "pred": 1,
+   "real": 0,
+   "real_pct": 81.5,
+   "sin_cel": false
+  },
+  {
+   "id": "E0415",
+   "pct": 81.7,
+   "tend": 0.0,
+   "racha": 2,
+   "aus2": 5,
+   "prob": 0.48,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 82.2,
+   "sin_cel": true
+  },
+  {
+   "id": "E0094",
+   "pct": 96.7,
+   "tend": -0.32,
+   "racha": 1,
+   "aus2": 2,
+   "prob": 0.01,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 97.5,
+   "sin_cel": false
+  },
+  {
+   "id": "E0029",
+   "pct": 93.1,
+   "tend": -2.04,
+   "racha": 1,
+   "aus2": 4,
+   "prob": 0.65,
+   "pred": 1,
+   "real": 1,
+   "real_pct": 73.7,
+   "sin_cel": false
+  },
+  {
+   "id": "E0171",
+   "pct": 82.2,
+   "tend": -2.1,
+   "racha": 2,
+   "aus2": 10,
+   "prob": 0.94,
+   "pred": 1,
+   "real": 1,
+   "real_pct": 49.6,
+   "sin_cel": false
+  },
+  {
+   "id": "E0050",
+   "pct": 93.2,
+   "tend": 0.27,
+   "racha": 1,
+   "aus2": 1,
+   "prob": 0.03,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 96.6,
+   "sin_cel": false
+  },
+  {
+   "id": "E0427",
+   "pct": 85.8,
+   "tend": 0.71,
+   "racha": 2,
+   "aus2": 4,
+   "prob": 0.06,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 91.6,
+   "sin_cel": true
+  },
+  {
+   "id": "E0231",
+   "pct": 93.3,
+   "tend": -1.03,
+   "racha": 2,
+   "aus2": 2,
+   "prob": 0.48,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 86.7,
+   "sin_cel": false
+  },
+  {
+   "id": "E0193",
+   "pct": 87.5,
+   "tend": 1.03,
+   "racha": 2,
+   "aus2": 2,
+   "prob": 0.09,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 86.4,
+   "sin_cel": false
+  },
+  {
+   "id": "E0403",
+   "pct": 75.4,
+   "tend": -4.2,
+   "racha": 2,
+   "aus2": 12,
+   "prob": 0.82,
+   "pred": 1,
+   "real": 1,
+   "real_pct": 40.7,
+   "sin_cel": true
+  },
+  {
+   "id": "E0324",
+   "pct": 97.5,
+   "tend": 0.56,
+   "racha": 2,
+   "aus2": 0,
+   "prob": 0.02,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 96.6,
+   "sin_cel": false
+  },
+  {
+   "id": "E0366",
+   "pct": 97.5,
+   "tend": -0.77,
+   "racha": 1,
+   "aus2": 0,
+   "prob": 0.02,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 99.2,
+   "sin_cel": false
+  },
+  {
+   "id": "E0170",
+   "pct": 96.7,
+   "tend": -1.27,
+   "racha": 1,
+   "aus2": 2,
+   "prob": 0.0,
+   "pred": 0,
+   "real": 0,
+   "real_pct": 97.5,
+   "sin_cel": false
+  }
+ ],
+ "edge": [
+  {
+   "id": "E0373",
+   "pct": 83.3,
+   "tend": -5.56,
+   "racha": 3,
+   "aus2": 12,
+   "prob": 0.98,
+   "pred": 1,
+   "real": 0,
+   "real_pct": 85.5,
+   "sin_cel": false,
+   "justif": 0,
+   "ini_deriva": 3
+  },
+  {
+   "id": "E0144",
+   "pct": 93.1,
+   "tend": -0.05,
+   "racha": 2,
+   "aus2": 1,
+   "prob": 0.08,
+   "pred": 0,
+   "real": 1,
+   "real_pct": 79.8,
+   "sin_cel": false,
+   "justif": 4,
+   "ini_deriva": null
+  },
+  {
+   "id": "E0158",
+   "pct": 95.8,
+   "tend": 0.71,
+   "racha": 1,
+   "aus2": 1,
+   "prob": 0.13,
+   "pred": 0,
+   "real": 1,
+   "real_pct": 76.9,
+   "sin_cel": false,
+   "justif": 0,
+   "ini_deriva": 9
+  },
+  {
+   "id": "E0134",
+   "pct": 89.8,
+   "tend": -0.2,
+   "racha": 1,
+   "aus2": 3,
+   "prob": 0.81,
+   "pred": 1,
+   "real": 0,
+   "real_pct": 83.1,
+   "sin_cel": false,
+   "justif": 2,
+   "ini_deriva": 10
+  },
+  {
+   "id": "E0395",
+   "pct": 84.9,
+   "tend": -2.38,
+   "racha": 3,
+   "aus2": 7,
+   "prob": 0.8,
+   "pred": 1,
+   "real": 0,
+   "real_pct": 84.8,
+   "sin_cel": false,
+   "justif": 1,
+   "ini_deriva": null
+  },
+  {
+   "id": "E0063",
+   "pct": 85.8,
+   "tend": -1.98,
+   "racha": 2,
+   "aus2": 5,
+   "prob": 0.21,
+   "pred": 0,
+   "real": 1,
+   "real_pct": 74.2,
+   "sin_cel": true,
+   "justif": 0,
+   "ini_deriva": 11
+  }
+ ],
+ "umbral_0.3": {
+  "precision": 0.412,
+  "recall": 0.903,
+  "f1": 0.566,
+  "accuracy": 0.701,
+  "tp": 28,
+  "fp": 40,
+  "fn": 3,
+  "tn": 73
+ },
+ "umbral_0.4": {
+  "precision": 0.467,
+  "recall": 0.903,
+  "f1": 0.615,
+  "accuracy": 0.757,
+  "tp": 28,
+  "fp": 32,
+  "fn": 3,
+  "tn": 81
+ },
+ "n_test": 144,
+ "n_train": 336,
+ "ejemplos": [
+  {
+   "id": "E0034",
+   "prob": 1.0,
+   "pct": 67.2,
+   "tend": -7.88,
+   "real": 1
+  },
+  {
+   "id": "E0242",
+   "prob": 0.95,
+   "pct": 76.3,
+   "tend": -8.36,
+   "real": 1
+  },
+  {
+   "id": "E0355",
+   "prob": 0.77,
+   "pct": 95.8,
+   "tend": -0.26,
+   "real": 0
+  },
+  {
+   "id": "E0372",
+   "prob": 0.39,
+   "pct": 96.6,
+   "tend": 0.35,
+   "real": 0
+  },
+  {
+   "id": "E0413",
+   "prob": 0.05,
+   "pct": 94.1,
+   "tend": 1.22,
+   "real": 0
+  },
+  {
+   "id": "E0268",
+   "prob": 0.01,
+   "pct": 95.8,
+   "tend": -0.08,
+   "real": 0
+  }
+ ]
+}
