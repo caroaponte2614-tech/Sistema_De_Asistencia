@@ -22,8 +22,8 @@ No hace falta instalar Maven: el proyecto trae el wrapper (`mvnw` / `mvnw.cmd`).
 ### 1. Clonar
 
 ```bash
-git clone https://github.com/Guio3141592653589793238462643383/School_Plus.git
-cd School_Plus
+git clone https://github.com/caroaponte2614-tech/Sistema_De_Asistencia.git
+cd Sistema_De_Asistencia
 ```
 
 ### 2. Crear la base de datos
